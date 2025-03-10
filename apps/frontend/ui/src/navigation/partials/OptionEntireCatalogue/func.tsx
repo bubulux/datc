@@ -4,17 +4,21 @@ import { OptionLayoutTemplate } from "@app-ui/navigation/templates";
 
 type TProps = {
   onRequestCatalogue: () => void;
+  isRequestingCatalogue: boolean;
+  disableButton: boolean;
 };
 
 export default function OptionEntireCatalogue({
   onRequestCatalogue,
+  isRequestingCatalogue,
+  disableButton,
 }: TProps): JSX.Element {
   return (
     <OptionLayoutTemplate
-      header="Catalogue"
-      subtitle="Will fetch the entire catalogue"
-      onSearch={onRequestCatalogue}
-      disabledSearch={false}
+      header="Fetch the entire catalogue"
+      onClick={onRequestCatalogue}
+      disableClick={disableButton}
+      isLoading={isRequestingCatalogue}
     />
   );
 }

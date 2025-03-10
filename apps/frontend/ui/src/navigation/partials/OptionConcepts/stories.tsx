@@ -13,7 +13,39 @@ export default meta;
 type Story = StoryObj<typeof OptionConcepts>;
 
 export const Index: Story = {
+  argTypes: {
+    concepts: { control: false },
+    onSearch: { control: false },
+    checkedValuesState: { control: false },
+    setCheckedValuesState: { control: false },
+  },
   render: (props) => {
+    const [checkedValues, setCheckedValues] = useState<
+      Record<string, string[]>
+    >({
+      concept: [],
+    });
+
+    return (
+      <OptionConcepts
+        concepts={[
+          "Partiality",
+          "Signaling",
+          "Connectivity",
+          "Transformativity",
+        ]}
+        onSearch={() => {}}
+        isReqestingConcepts={props.isReqestingConcepts}
+        disableButton={props.disableButton}
+        checkedValuesState={checkedValues}
+        setCheckedValuesState={setCheckedValues}
+      />
+    );
+  },
+};
+
+export const FlowWithoutOverflow: Story = {
+  render: () => {
     const [checkedValues, setCheckedValues] = useState<
       Record<string, string[]>
     >({
@@ -35,12 +67,8 @@ export const Index: Story = {
             setIsFetching(false);
           }, 2000);
         }}
-        isReqestingConcepts={isFetching || props.isReqestingConcepts}
-        disableButton={
-          checkedValues.concept.length === 0 ||
-          isFetching ||
-          props.disableButton
-        }
+        isReqestingConcepts={isFetching}
+        disableButton={checkedValues.concept.length === 0 || isFetching}
         checkedValuesState={checkedValues}
         setCheckedValuesState={setCheckedValues}
       />
@@ -48,20 +76,7 @@ export const Index: Story = {
   },
 };
 
-export const WithOverflow: Story = {
-  args: {
-    concepts: [
-      "Partiality",
-      "Signaling",
-      "Connectivity",
-      "Transformativity",
-      "Adaptability",
-      "Inclusivity",
-      "Interactivity",
-      "Reactivity",
-      "Sustainability",
-    ],
-  },
+export const FlowWithOverflow: Story = {
   render: () => {
     const [checkedValues, setCheckedValues] = useState<
       Record<string, string[]>

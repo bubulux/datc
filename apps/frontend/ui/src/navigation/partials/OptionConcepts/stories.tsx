@@ -6,10 +6,6 @@ import OptionConcepts from "@app-ui/navigation/partials/OptionConcepts";
 const meta: Meta = {
   title: "App/UI/Navigation/Partials/OptionConcepts",
   component: OptionConcepts,
-  args: {
-    concepts: ["Partiality", "Signaling", "Connectivity", "Transformativity"],
-    onSearch: () => {},
-  },
 };
 
 export default meta;
@@ -17,7 +13,7 @@ export default meta;
 type Story = StoryObj<typeof OptionConcepts>;
 
 export const Index: Story = {
-  render: () => {
+  render: (props) => {
     const [checkedValues, setCheckedValues] = useState<
       Record<string, string[]>
     >({
@@ -39,8 +35,12 @@ export const Index: Story = {
             setIsFetching(false);
           }, 2000);
         }}
-        isReqestingConcepts={isFetching}
-        disableButton={checkedValues.concept.length === 0 || isFetching}
+        isReqestingConcepts={isFetching || props.isReqestingConcepts}
+        disableButton={
+          checkedValues.concept.length === 0 ||
+          isFetching ||
+          props.disableButton
+        }
         checkedValuesState={checkedValues}
         setCheckedValuesState={setCheckedValues}
       />

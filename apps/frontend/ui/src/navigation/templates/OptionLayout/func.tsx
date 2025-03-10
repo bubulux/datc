@@ -1,35 +1,37 @@
 import type { JSX, ReactNode } from "react";
 
-import { Flex, Button } from "@lib-components";
+import { Flex, Button, Spinner } from "@lib-components";
 import { Subtitle2, Caption2 } from "@lib-theme";
 
 import useOptionLayoutClasses from "@app-ui/navigation/templates/OptionLayout/styles";
 
 type TProps = {
   header: string;
-  subtitle: string;
+  onClick: () => void;
+  disableClick?: boolean;
+  isLoading?: boolean;
+  subtitle?: string;
   children?: ReactNode;
-  onSearch: () => void;
-  disabledSearch: boolean;
 };
 
 export default function OptionLayout({
   header,
-  subtitle,
+  onClick,
+  subtitle = undefined,
   children = undefined,
-  onSearch,
-  disabledSearch,
+  disableClick = false,
+  isLoading = false,
 }: TProps): JSX.Element {
   const classes = useOptionLayoutClasses();
   return (
     <Flex className={classes.root} direction="column" padding={["M"]} gap="M">
       <Flex direction="column" gap="XS">
         <Subtitle2>{header}</Subtitle2>
-        <Caption2>{subtitle}</Caption2>
+        {subtitle && <Caption2>{subtitle}</Caption2>}
       </Flex>
       {children}
-      <Button appearance="primary" disabled={disabledSearch} onClick={onSearch}>
-        Search
+      <Button appearance="primary" disabled={disableClick} onClick={onClick}>
+        {isLoading ? <Spinner size="tiny" appearance="inverted" /> : "Search"}
       </Button>
     </Flex>
   );

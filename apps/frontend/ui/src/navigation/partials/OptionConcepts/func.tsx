@@ -1,4 +1,4 @@
-import type { JSX } from "react";
+import type { JSX, Dispatch, SetStateAction } from "react";
 
 import { MenuList } from "@lib-components";
 
@@ -9,23 +9,34 @@ import { useSelectionState } from "@app-ui/navigation/partials/OptionConcepts/ho
 
 type TProps = {
   concepts: string[];
-  onSearch: (value: string) => void;
+  /** must be initialized with { concept: [] }, only then inner functions apply state correctly */
+  checkedValuesState: Record<string, string[]>;
+  setCheckedValuesState: Dispatch<SetStateAction<Record<string, string[]>>>;
+  onSearch: () => void;
+  isReqestingConcepts: boolean;
+  disableButton: boolean;
 };
 
 export default function OptionConcepts({
   concepts,
   onSearch,
+  isReqestingConcepts,
+  checkedValuesState,
+  setCheckedValuesState,
+  disableButton,
 }: TProps): JSX.Element {
   const classes = useOptionConceptsClasses();
-  const { checkedValues, onChange } = useSelectionState();
+  const { checkedValues, onChange } = useSelectionState(
+    checkedValuesState,
+    setCheckedValuesState,
+  );
   return (
     <OptionLayoutTemplate
       header="Search through recongizable concepts"
-      subtitle="Choose from the given list below"
-      onSearch={() => {
-        onSearch(checkedValues.concept[0]);
-      }}
-      disabledSearch={checkedValues.concept.length === 0}
+      subtitle="Choose one from the given list below"
+      onClick={onSearch}
+      disableClick={disableButton}
+      isLoading={isReqestingConcepts}
     >
       <MenuList
         className={classes.list}

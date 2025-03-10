@@ -1,10 +1,10 @@
-import { useState } from "react";
+import type { SetStateAction, Dispatch } from "react";
 import type { MenuProps as TMenuProps } from "@fluentui/react-components";
 
-function useSelectionState() {
-  const [checkedValues, setCheckedValues] = useState<Record<string, string[]>>({
-    concept: [],
-  });
+function useSelectionState(
+  checkedValues: Record<string, string[]>,
+  setCheckedValues: Dispatch<SetStateAction<Record<string, string[]>>>,
+) {
   const onChange: TMenuProps["onCheckedValueChange"] = (
     _,
     { name, checkedItems },

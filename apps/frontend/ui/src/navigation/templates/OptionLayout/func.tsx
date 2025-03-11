@@ -9,6 +9,7 @@ type TProps = {
   header: string;
   onClick: () => void;
   disableClick?: boolean;
+  buttonLabel?: string;
   isLoading?: boolean;
   subtitle?: string;
   children?: ReactNode;
@@ -17,6 +18,7 @@ type TProps = {
 export default function OptionLayout({
   header,
   onClick,
+  buttonLabel = "Search",
   subtitle = undefined,
   children = undefined,
   disableClick = false,
@@ -31,7 +33,11 @@ export default function OptionLayout({
       </Flex>
       {children}
       <Button appearance="primary" disabled={disableClick} onClick={onClick}>
-        {isLoading ? <Spinner size="tiny" appearance="inverted" /> : "Search"}
+        {isLoading ? (
+          <Spinner size="tiny" appearance="inverted" />
+        ) : (
+          buttonLabel
+        )}
       </Button>
     </Flex>
   );

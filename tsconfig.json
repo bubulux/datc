@@ -18,7 +18,9 @@
       "@lib-components": ["libs/components/src"],
       "@lib-components/*": ["libs/components/src/*"],
       "@lib-theme": ["libs/theme/src"],
-      "@lib-theme/*": ["libs/theme/src/*"]
+      "@lib-theme/*": ["libs/theme/src/*"],
+      "@lib-hooks": ["libs/hooks/src"],
+      "@lib-hooks/*": ["libs/hooks/src/*"]
     }
   }
 }

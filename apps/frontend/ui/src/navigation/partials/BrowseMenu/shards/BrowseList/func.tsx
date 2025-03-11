@@ -38,7 +38,7 @@ export default function BrowseList({
       <TabTemplate
         value="Trace"
         onClick={setCurrentSelection}
-        dataTestId={constants.testIdRandomTab}
+        dataTestId={constants.testIdTraceTab}
       />
       <TabTemplate
         value="Word"

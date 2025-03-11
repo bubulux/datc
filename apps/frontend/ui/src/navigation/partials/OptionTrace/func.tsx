@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { JSX } from "react";
 
 import { useComboboxFilter, useId } from "@lib-hooks";
-import { Combobox, Flex } from "@lib-components";
+import { Combobox, Field } from "@lib-components";
 import type { TComboboxProps } from "@lib-components";
 
 import { OptionLayoutTemplate } from "../../templates";
@@ -12,7 +12,6 @@ const options = [
   { children: "Alligator", value: "Alligator" },
   { children: "Bee", value: "Bee" },
   { children: "Bird", value: "Bird" },
-  { children: "Cheetah", disabled: true, value: "Cheetah" },
   { children: "Dog", value: "Dog" },
   { children: "Dolphin", value: "Dolphin" },
   { children: "Ferret", value: "Ferret" },
@@ -46,8 +45,7 @@ export default function OptionTrace({}: TProps): JSX.Element {
       disableClick={false}
       buttonLabel="Construct trace tree"
     >
-      <Flex direction="column" gap="SNudge">
-        <label id={comboId}>Search</label>
+      <Field label="Search" validationState="none">
         <Combobox
           onOptionSelect={onOptionSelect}
           aria-labelledby={comboId}
@@ -57,7 +55,7 @@ export default function OptionTrace({}: TProps): JSX.Element {
         >
           {children}
         </Combobox>
-      </Flex>
+      </Field>
     </OptionLayoutTemplate>
   );
 }

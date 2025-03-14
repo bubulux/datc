@@ -35,7 +35,6 @@ export default function OptionTrace({
     <OptionLayoutTemplate
       header="Trace a Word"
       subtitle="Use a word as a anchor and find words that are related to it."
-      isLoading={false}
       withoutButton
     >
       <Field id={comboId} label="Select a known word">

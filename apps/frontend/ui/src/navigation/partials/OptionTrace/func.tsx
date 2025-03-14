@@ -1,72 +1,66 @@
 import { useState } from "react";
 import type { JSX } from "react";
 
-import { useComboboxFilter, useId } from "@lib-hooks";
-import { Combobox, Field } from "@lib-components";
+import { useId } from "@lib-hooks";
+import { Combobox, Field, Option, Spinner } from "@lib-components";
 import type { TComboboxProps } from "@lib-components";
 
 import { OptionLayoutTemplate } from "../../templates";
 import useClasses from "./styles";
 
-const options = [
-  // { children: "Alligator", value: "Alligator" },
-  // { children: "Bee", value: "Bee" },
-  // { children: "Bird", value: "Bird" },
-  // { children: "Dog", value: "Dog" },
-  // { children: "Dolphin", value: "Dolphin" },
-  // { children: "Ferret", value: "Ferret" },
-  // { children: "Firefly", value: "Firefly" },
-  // { children: "Fish", value: "Fish" },
-  // { children: "Goat", value: "Goat" },
-  // { children: "Horse", value: "Horse" },
-  // { children: "Lion", value: "Lion" },
-];
+type TProps = {
+  results: string[];
+  isBouncing: boolean;
+  isFetching: boolean;
+  onChange: TComboboxProps["onChange"];
+  onOptionSelect: () => void;
+};
 
-type TProps = {};
-
-export default function OptionTrace({}: TProps): JSX.Element {
+export default function OptionTrace({
+  results,
+  isBouncing,
+  isFetching,
+  onChange,
+  onOptionSelect,
+}: TProps): JSX.Element {
   const classes = useClasses();
-  const comboId = useId();
-  const [query, setQuery] = useState<string>("");
-  const currentQueryHasExactMatch = options.some(
-    (option) => option.children === query,
-  );
-
-  const children = useComboboxFilter(query, options, {
-    noOptionsMessage: "No animals match your search.",
-  });
-  const onOptionSelect: TComboboxProps["onOptionSelect"] = (_, data) => {
-    setQuery(data.optionText ?? "");
-  };
+  const comboId = useId("combobox");
 
   return (
     <OptionLayoutTemplate
       header="Trace a Word"
       subtitle="Use a word as a anchor and find words that are related to it."
-      onClick={() => {}}
       isLoading={false}
-      disableClick={false}
-      buttonLabel="Construct trace tree"
+      withoutButton
     >
-      <Field
-        label="Search"
-        validationState={currentQueryHasExactMatch ? "success" : "error"}
-        validationMessage={
-          currentQueryHasExactMatch
-            ? "This word is known."
-            : "This word is not known."
-        }
-      >
+      <Field id={comboId} label="Select a known word">
         <Combobox
-          onOptionSelect={onOptionSelect}
           aria-labelledby={comboId}
-          placeholder="Select a known word from the dictionary"
-          onChange={(ev) => {
-            setQuery(ev.target.value);
-          }}
-          value={query}
+          placeholder="Start typing for suggestions"
+          onChange={onChange}
         >
-          {children}
+          {isFetching ? (
+            <Option text="" disabled className={classes.loading}>
+              <Spinner size="extra-small" label="Searching, hold on..." />
+            </Option>
+          ) : (
+            results.map((word) => (
+              <Option
+                key={word}
+                text={word}
+                disabled={isBouncing}
+                onClick={onOptionSelect}
+              >
+                {word}
+              </Option>
+            ))
+          )}
+
+          {results.length === 0 && (
+            <Option text="" disabled className={classes.optionReadOnly}>
+              No matching words found...
+            </Option>
+          )}
         </Combobox>
       </Field>
     </OptionLayoutTemplate>

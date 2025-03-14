@@ -6,6 +6,7 @@ export { MenuList } from "@fluentui/react-components";
 export { MenuItemRadio } from "@fluentui/react-components";
 export { Spinner } from "@fluentui/react-components";
 export { Field } from "@fluentui/react-components";
+export { Option } from "@fluentui/react-components";
 
 export { Collapse } from "@fluentui/react-motion-components-preview";
 

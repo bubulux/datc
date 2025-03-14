@@ -11,4 +11,22 @@ export default meta;
 
 type Story = StoryObj<typeof OptionTrace>;
 
-export const Index: Story = {};
+export const Index: Story = {
+  args: {
+    // results: [],
+    results: [
+      "apple",
+      "banana",
+      "cherry",
+      "date",
+      "elderberry",
+      "fig",
+      "grape",
+      "honeydew",
+      "kiwi",
+    ],
+    isBouncing: false,
+    isFetching: false,
+    onChange: () => {},
+  },
+};

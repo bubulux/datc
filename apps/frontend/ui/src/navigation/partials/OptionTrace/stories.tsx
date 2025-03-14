@@ -4,7 +4,16 @@ import OptionTrace from "./func";
 const meta: Meta = {
   title: "app/ui/navigation/partials/OptionTrace",
   component: OptionTrace,
-  args: {},
+  args: {
+    options: ["apple", "banana", "cherry"],
+    disableInput: false,
+    showIsSearching: false,
+    showNoResults: false,
+    showResults: false,
+    disableResults: false,
+    onChange: () => {},
+    onOptionSelect: () => {},
+  },
 };
 
 export default meta;
@@ -13,8 +22,7 @@ type Story = StoryObj<typeof OptionTrace>;
 
 export const Index: Story = {
   args: {
-    // results: [],
-    results: [
+    options: [
       "apple",
       "banana",
       "cherry",
@@ -32,9 +40,25 @@ export const Index: Story = {
       "quince",
       "raspberry",
     ],
-    isBouncing: false,
-    isFetching: false,
-    requestSubmitted: false,
-    onChange: () => {},
+  },
+};
+
+export const NoResults: Story = {
+  args: {
+    options: [],
+    showNoOptionsFound: true,
+  },
+};
+
+export const IsUpdatingQuery: Story = {
+  args: {
+    showIsSearching: true,
+  },
+};
+
+export const IsBouncingCache: Story = {
+  args: {
+    showResults: true,
+    disableResults: true,
   },
 };

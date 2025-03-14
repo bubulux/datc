@@ -8,19 +8,23 @@ import { OptionLayoutTemplate } from "../../templates";
 import useClasses from "./styles";
 
 type TProps = {
-  results: string[];
-  isBouncing: boolean;
-  isFetching: boolean;
-  requestSubmitted: boolean;
+  options: string[];
+  disableInput: boolean;
+  showIsSearching: boolean;
+  showNoOptionsFound: boolean;
+  showResults: boolean;
+  disableResults: boolean;
   onChange: TComboboxProps["onChange"];
   onOptionSelect: (word: string) => void;
 };
 
 export default function OptionTrace({
-  results,
-  isBouncing,
-  isFetching,
-  requestSubmitted,
+  options,
+  disableInput,
+  showIsSearching,
+  showNoOptionsFound,
+  showResults,
+  disableResults,
   onChange,
   onOptionSelect,
 }: TProps): JSX.Element {
@@ -39,29 +43,30 @@ export default function OptionTrace({
           aria-labelledby={comboId}
           placeholder="Start typing for suggestions"
           onChange={onChange}
-          disabled={requestSubmitted}
+          disabled={disableInput}
         >
           <div className={classes.optionList}>
-            {isFetching ? (
+            {showIsSearching && (
               <Flex padding={["S"]} justifyContent="center">
                 <Spinner size="extra-small" label="Searching, hold on..." />
               </Flex>
-            ) : (
-              results.map((word) => (
+            )}
+
+            {showResults &&
+              options.map((word) => (
                 <Option
                   key={word}
                   text={word}
-                  disabled={isBouncing}
+                  disabled={disableResults}
                   onClick={() => {
                     onOptionSelect(word);
                   }}
                 >
                   {word}
                 </Option>
-              ))
-            )}
+              ))}
 
-            {results.length === 0 && (
+            {showNoOptionsFound && (
               <Flex padding={["S"]}>No matching words found...</Flex>
             )}
           </div>

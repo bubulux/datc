@@ -1,15 +1,10 @@
-import { makeStyles, tokens } from "@lib-theme";
+import { makeStyles, EThemeDimensions } from "@lib-theme";
 
 const useClasses = makeStyles({
-  root: {},
-  optionReadOnly: {
-    color: tokens.colorNeutralForeground1,
-  },
-  loading: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    marginLeft: "-12px",
+  optionList: {
+    maxHeight: EThemeDimensions.L6,
+    overflowY: "auto",
+    overflowX: "hidden",
   },
 });
 

@@ -1,8 +1,7 @@
-import { useState } from "react";
 import type { JSX } from "react";
 
 import { useId } from "@lib-hooks";
-import { Combobox, Field, Option, Spinner } from "@lib-components";
+import { Combobox, Field, Option, Spinner, Flex } from "@lib-components";
 import type { TComboboxProps } from "@lib-components";
 
 import { OptionLayoutTemplate } from "../../templates";
@@ -12,14 +11,16 @@ type TProps = {
   results: string[];
   isBouncing: boolean;
   isFetching: boolean;
+  requestSubmitted: boolean;
   onChange: TComboboxProps["onChange"];
-  onOptionSelect: () => void;
+  onOptionSelect: (word: string) => void;
 };
 
 export default function OptionTrace({
   results,
   isBouncing,
   isFetching,
+  requestSubmitted,
   onChange,
   onOptionSelect,
 }: TProps): JSX.Element {
@@ -38,29 +39,32 @@ export default function OptionTrace({
           aria-labelledby={comboId}
           placeholder="Start typing for suggestions"
           onChange={onChange}
+          disabled={requestSubmitted}
         >
-          {isFetching ? (
-            <Option text="" disabled className={classes.loading}>
-              <Spinner size="extra-small" label="Searching, hold on..." />
-            </Option>
-          ) : (
-            results.map((word) => (
-              <Option
-                key={word}
-                text={word}
-                disabled={isBouncing}
-                onClick={onOptionSelect}
-              >
-                {word}
-              </Option>
-            ))
-          )}
+          <div className={classes.optionList}>
+            {isFetching ? (
+              <Flex padding={["S"]} justifyContent="center">
+                <Spinner size="extra-small" label="Searching, hold on..." />
+              </Flex>
+            ) : (
+              results.map((word) => (
+                <Option
+                  key={word}
+                  text={word}
+                  disabled={isBouncing}
+                  onClick={() => {
+                    onOptionSelect(word);
+                  }}
+                >
+                  {word}
+                </Option>
+              ))
+            )}
 
-          {results.length === 0 && (
-            <Option text="" disabled className={classes.optionReadOnly}>
-              No matching words found...
-            </Option>
-          )}
+            {results.length === 0 && (
+              <Flex padding={["S"]}>No matching words found...</Flex>
+            )}
+          </div>
         </Combobox>
       </Field>
     </OptionLayoutTemplate>

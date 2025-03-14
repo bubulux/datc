@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/react";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import { useDebounce } from "@lib-hooks";
 import OptionTrace from "./func";
@@ -92,9 +92,9 @@ async function fakeApi(query: string) {
 
   // @ts-expect-error - This is a fake API
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  const response: string[] | false = possibleQueries[query] ?? false;
+  const response: string[] = possibleQueries[query] ?? [];
 
-  return new Promise<string[] | false>((resolve) => {
+  return new Promise<string[]>((resolve) => {
     setTimeout(() => {
       resolve(response);
     }, 1000);
@@ -109,15 +109,39 @@ export const Flow: Story = {
     const [options, setOptions] = useState<string[]>([]);
     const [query, setQuery] = useState<string>("");
     const [debouncedQuery, isBouncing] = useDebounce(query, 2000);
+    const [isSearching, setIsSearching] = useState(false);
+
+    useEffect(() => {
+      // first check if the debounced query exists in the cache
+      // if yes apply the cache to the current options
+      // if not fetch from the fake api, apply query to cache and set then to current options list
+
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (queryToOptionsCache[debouncedQuery]) {
+        setOptions(queryToOptionsCache[debouncedQuery]);
+      } else {
+        setIsSearching(true);
+        // eslint-disable-next-line no-void, promise/always-return
+        void fakeApi(debouncedQuery).then((response) => {
+          setOptions(response);
+          setQueryToOptionsCache({
+            ...queryToOptionsCache,
+            [debouncedQuery]: response,
+          });
+          setIsSearching(false);
+        });
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [debouncedQuery]);
 
     return (
       <OptionTrace
-        options={[]}
+        options={options}
         disableInput={false}
-        showIsSearching={false}
+        showIsSearching={isSearching}
         disableResults={isBouncing}
-        showNoOptionsFound={options.length === 0}
-        showResults={options.length > 0}
+        showNoOptionsFound={!isSearching && options.length === 0}
+        showResults={!isSearching && options.length > 0}
         onChange={(e) => {
           setQuery(e.target.value);
         }}

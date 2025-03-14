@@ -14,6 +14,7 @@ type TProps = {
   showNoOptionsFound: boolean;
   showResults: boolean;
   disableResults: boolean;
+  showIsSubmitting: boolean;
   onChange: TComboboxProps["onChange"];
   onOptionSelect: (word: string) => void;
 };
@@ -25,6 +26,7 @@ export default function OptionTrace({
   showNoOptionsFound,
   showResults,
   disableResults,
+  showIsSubmitting,
   onChange,
   onOptionSelect,
 }: TProps): JSX.Element {
@@ -37,40 +39,47 @@ export default function OptionTrace({
       subtitle="Use a word as a anchor and find words that are related to it."
       withoutButton
     >
-      <Field id={comboId} label="Select a known word">
-        <Combobox
-          aria-labelledby={comboId}
-          placeholder="Start typing for suggestions"
-          onChange={onChange}
-          disabled={disableInput}
+      <Flex gap="M" justifyContent="spaceBetween" alignItems="end">
+        <Field
+          id={comboId}
+          label="Select a known word"
+          className={classes.field}
         >
-          <div className={classes.optionList}>
-            {showIsSearching && (
-              <Flex padding={["S"]} justifyContent="center">
-                <Spinner size="extra-small" label="Searching, hold on..." />
-              </Flex>
-            )}
+          <Combobox
+            aria-labelledby={comboId}
+            placeholder="Start typing for suggestions"
+            onChange={onChange}
+            disabled={disableInput}
+          >
+            <div className={classes.optionList}>
+              {showIsSearching && (
+                <Flex padding={["S"]} justifyContent="center">
+                  <Spinner size="extra-small" label="Searching, hold on..." />
+                </Flex>
+              )}
 
-            {showResults &&
-              options.map((word) => (
-                <Option
-                  key={word}
-                  text={word}
-                  disabled={disableResults}
-                  onClick={() => {
-                    onOptionSelect(word);
-                  }}
-                >
-                  {word}
-                </Option>
-              ))}
+              {showResults &&
+                options.map((word) => (
+                  <Option
+                    key={word}
+                    text={word}
+                    disabled={disableResults}
+                    onClick={() => {
+                      onOptionSelect(word);
+                    }}
+                  >
+                    {word}
+                  </Option>
+                ))}
 
-            {showNoOptionsFound && (
-              <Flex padding={["S"]}>No matching words found...</Flex>
-            )}
-          </div>
-        </Combobox>
-      </Field>
+              {showNoOptionsFound && (
+                <Flex padding={["S"]}>No matching words found...</Flex>
+              )}
+            </div>
+          </Combobox>
+        </Field>
+        {showIsSubmitting && <Spinner className={classes.spinner} />}
+      </Flex>
     </OptionLayoutTemplate>
   );
 }

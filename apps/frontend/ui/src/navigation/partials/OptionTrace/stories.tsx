@@ -3,6 +3,7 @@ import type { Meta, StoryObj } from "@storybook/react";
 import { useState, useEffect } from "react";
 
 import { useDebounce } from "@lib-hooks";
+import { Flex } from "@lib-components";
 import OptionTrace from "./func";
 
 const meta: Meta = {
@@ -15,6 +16,7 @@ const meta: Meta = {
     showNoResults: false,
     showResults: false,
     disableResults: false,
+    showIsSubmitting: false,
     onChange: () => {},
     onOptionSelect: () => {},
   },
@@ -110,6 +112,8 @@ export const Flow: Story = {
     const [query, setQuery] = useState<string>("");
     const [debouncedQuery, isBouncing] = useDebounce(query, 2000);
     const [isSearching, setIsSearching] = useState(false);
+    const [isRequesting, setIsRequesting] = useState(false);
+    const [currentRequest, setCurrentRequest] = useState("");
 
     useEffect(() => {
       // first check if the debounced query exists in the cache
@@ -135,18 +139,28 @@ export const Flow: Story = {
     }, [debouncedQuery]);
 
     return (
-      <OptionTrace
-        options={options}
-        disableInput={false}
-        showIsSearching={isSearching}
-        disableResults={isBouncing}
-        showNoOptionsFound={!isSearching && options.length === 0}
-        showResults={!isSearching && options.length > 0}
-        onChange={(e) => {
-          setQuery(e.target.value);
-        }}
-        onOptionSelect={() => {}}
-      />
+      <Flex gap="XXL" alignItems="center">
+        <OptionTrace
+          options={options}
+          disableInput={isRequesting}
+          showIsSearching={isSearching}
+          disableResults={isBouncing}
+          showNoOptionsFound={!isSearching && options.length === 0}
+          showResults={!isSearching && options.length > 0}
+          onChange={(e) => {
+            setQuery(e.target.value);
+          }}
+          onOptionSelect={(word) => {
+            setCurrentRequest(word);
+            setIsRequesting(true);
+            setTimeout(() => {
+              setIsRequesting(false);
+            }, 3000);
+          }}
+          showIsSubmitting={isRequesting}
+        />
+        <span>{`Current request: ${currentRequest || "none"}`}</span>
+      </Flex>
     );
   },
 };

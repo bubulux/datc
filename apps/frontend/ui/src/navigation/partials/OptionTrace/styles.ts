@@ -6,6 +6,12 @@ const useClasses = makeStyles({
     overflowY: "auto",
     overflowX: "hidden",
   },
+  spinner: {
+    padding: "2px",
+  },
+  field: {
+    width: "100%",
+  },
 });
 
 export default useClasses;

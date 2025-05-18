@@ -65,7 +65,6 @@ export const IsUpdatingQuery: Story = {
 
 export const IsBouncingCache: Story = {
   args: {
-    showResults: true,
     disableResults: true,
   },
 };

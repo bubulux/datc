@@ -47,7 +47,7 @@ describe("OptionTrace", () => {
   it("should render a message with no words found", () => {
     render(
       <OptionTrace
-        options={["apple", "banana", "cherry", "date"]}
+        options={[]}
         disableInput={false}
         showIsSearching={false}
         showNoOptionsFound
@@ -61,5 +61,25 @@ describe("OptionTrace", () => {
 
     fireEvent.click(screen.getByRole("combobox"));
     expect(screen.getByText("No matching words found...")).toBeVisible();
+  });
+
+  it("should render a spinner when searching for words", () => {
+    render(
+      <OptionTrace
+        options={[]}
+        disableInput={false}
+        showIsSearching
+        showNoOptionsFound={false}
+        showResults={false}
+        disableResults={false}
+        showIsSubmitting={false}
+        onChange={() => {}}
+        onOptionSelect={() => {}}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox"));
+
+    expect(screen.getByText("Searching, hold on...")).toBeVisible();
   });
 });

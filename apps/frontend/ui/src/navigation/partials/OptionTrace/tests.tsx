@@ -1,5 +1,3 @@
-import { useState } from "react";
-
 import { render, screen, fireEvent } from "@tests-unit-browser";
 import "@testing-library/jest-dom";
 
@@ -122,5 +120,49 @@ describe("OptionTrace", () => {
     );
     expect(screen.getByLabelText("Submitting...")).toBeVisible();
     expect(screen.getByRole("combobox")).toBeDisabled();
+  });
+
+  it("should call onChange when the input changes", () => {
+    const handleChange = jest.fn();
+    render(
+      <OptionTrace
+        options={["apple", "banana", "cherry"]}
+        disableInput={false}
+        showIsSearching={false}
+        showNoOptionsFound={false}
+        showResults={false}
+        disableResults={false}
+        showIsSubmitting={false}
+        onChange={handleChange}
+        onOptionSelect={() => {}}
+      />,
+    );
+
+    fireEvent.change(screen.getByRole("combobox"), {
+      target: { value: "apple" },
+    });
+    expect(handleChange).toHaveBeenCalled();
+  });
+
+  it("should call onOptionSelect when an option is clicked", () => {
+    const handleOptionSelect = jest.fn();
+    render(
+      <OptionTrace
+        options={["apple", "banana", "cherry"]}
+        disableInput={false}
+        showIsSearching={false}
+        showNoOptionsFound={false}
+        showResults
+        disableResults={false}
+        showIsSubmitting={false}
+        onChange={() => {}}
+        onOptionSelect={handleOptionSelect}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox"));
+
+    fireEvent.click(screen.getByText("apple"));
+    expect(handleOptionSelect).toHaveBeenCalledWith("apple");
   });
 });

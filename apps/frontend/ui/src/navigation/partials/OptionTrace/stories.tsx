@@ -14,7 +14,7 @@ const meta: Meta = {
     disableInput: false,
     showIsSearching: false,
     showNoResults: false,
-    showResults: false,
+    showResults: true,
     disableResults: false,
     showIsSubmitting: false,
     onChange: () => {},
@@ -59,6 +59,7 @@ export const NoResults: Story = {
 export const IsUpdatingQuery: Story = {
   args: {
     showIsSearching: true,
+    showResults: false,
   },
 };
 

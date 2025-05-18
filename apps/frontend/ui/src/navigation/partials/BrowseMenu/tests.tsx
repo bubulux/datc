@@ -35,12 +35,12 @@ describe("BrowseMenu", () => {
 
     const catalogueTab = screen.getByTestId(constants.testIdCatalogueTab);
     const conceptsTab = screen.getByTestId(constants.testIdConceptsTab);
-    const randomTab = screen.getByTestId(constants.testIdRandomTab);
+    const traceTab = screen.getByTestId(constants.testIdTraceTab);
     const wordTab = screen.getByTestId(constants.testIdWordTab);
     const filterTab = screen.getByTestId(constants.testIdFilterTab);
     expect(catalogueTab).toHaveAttribute("aria-selected", "false");
     expect(conceptsTab).toHaveAttribute("aria-selected", "false");
-    expect(randomTab).toHaveAttribute("aria-selected", "false");
+    expect(traceTab).toHaveAttribute("aria-selected", "false");
     expect(wordTab).toHaveAttribute("aria-selected", "false");
     expect(filterTab).toHaveAttribute("aria-selected", "false");
   });
@@ -57,7 +57,7 @@ describe("BrowseMenu", () => {
     const toggleButton = screen.getByTestId(constants.testIdExpandButton);
     const catalogueTab = screen.getByTestId(constants.testIdCatalogueTab);
     const conceptsTab = screen.getByTestId(constants.testIdConceptsTab);
-    const randomTab = screen.getByTestId(constants.testIdRandomTab);
+    const traceTab = screen.getByTestId(constants.testIdTraceTab);
     const wordTab = screen.getByTestId(constants.testIdWordTab);
     const filterTab = screen.getByTestId(constants.testIdFilterTab);
 
@@ -65,7 +65,7 @@ describe("BrowseMenu", () => {
 
     expect(catalogueTab).toBeVisible();
     expect(conceptsTab).toBeVisible();
-    expect(randomTab).toBeVisible();
+    expect(traceTab).toBeVisible();
     expect(wordTab).toBeVisible();
     expect(filterTab).toBeVisible();
     expect(screen.queryByText("Option Slot")).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe("BrowseMenu", () => {
 
     expect(catalogueTab).not.toBeVisible();
     expect(conceptsTab).not.toBeVisible();
-    expect(randomTab).not.toBeVisible();
+    expect(traceTab).not.toBeVisible();
     expect(wordTab).not.toBeVisible();
     expect(filterTab).not.toBeVisible();
     expect(screen.queryByText("Option Slot")).toBeInTheDocument();

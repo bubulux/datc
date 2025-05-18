@@ -1,7 +1,7 @@
 export type TUiBrowseMenuOption =
   | "Catalogue"
   | "Concepts"
-  | "Random"
+  | "Trace"
   | "Word"
   | "Filter"
   | "None";

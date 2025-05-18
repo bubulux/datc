@@ -33,8 +33,8 @@ const useListToBrowseConnectorClasses = makeStyles({
   connectorConcepts: {
     width: EThemeDimensions.S4,
   },
-  connectorRandom: {
-    width: EThemeDimensions.S6,
+  connectorTrace: {
+    width: EThemeDimensions.M1,
   },
   connectorWord: {
     width: EThemeDimensions.M1,

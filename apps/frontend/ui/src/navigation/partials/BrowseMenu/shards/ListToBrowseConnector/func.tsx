@@ -46,8 +46,8 @@ export default function ListToBrowseConnector({
         />
         <div
           className={createHorConnClass(
-            currentSelection === "Random",
-            classes.connectorRandom,
+            currentSelection === "Trace",
+            classes.connectorTrace,
           )}
         />
         <div

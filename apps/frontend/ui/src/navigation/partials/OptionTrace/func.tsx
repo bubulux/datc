@@ -78,7 +78,9 @@ export default function OptionTrace({
             </div>
           </Combobox>
         </Field>
-        {showIsSubmitting && <Spinner className={classes.spinner} />}
+        {showIsSubmitting && (
+          <Spinner className={classes.spinner} aria-label="Submitting..." />
+        )}
       </Flex>
     </OptionLayoutTemplate>
   );

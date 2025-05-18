@@ -105,4 +105,22 @@ describe("OptionTrace", () => {
     expect(screen.getByText("cherry")).toBeVisible();
     expect(screen.getByText("cherry")).toHaveAttribute("aria-disabled", "true");
   });
+
+  it("should render a spinner next to the input and blocking the input", () => {
+    render(
+      <OptionTrace
+        options={[]}
+        disableInput
+        showIsSearching={false}
+        showNoOptionsFound={false}
+        showResults={false}
+        disableResults={false}
+        showIsSubmitting
+        onChange={() => {}}
+        onOptionSelect={() => {}}
+      />,
+    );
+    expect(screen.getByLabelText("Submitting...")).toBeVisible();
+    expect(screen.getByRole("combobox")).toBeDisabled();
+  });
 });

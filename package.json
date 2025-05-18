@@ -10,7 +10,7 @@
     "@fluentui/react-motion-components-preview": "^0.3.1",
     "@griffel/react": "^1.5.25",
     "@reduxjs/toolkit": "^2.2.8",
-    "fluentui-helpers": "0.3.0",
+    "fluentui-helpers": "0.3.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-redux": "^9.1.2"

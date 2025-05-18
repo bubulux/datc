@@ -1,10 +1,65 @@
-//import { render, screen } from '@tests-unit-browser';
+import { useState } from "react";
+
+import { render, screen, fireEvent } from "@tests-unit-browser";
 import "@testing-library/jest-dom";
 
 import OptionTrace from "./func";
 
 describe("OptionTrace", () => {
-  it("should render", () => {
-    expect(true).toBe(true);
+  it("should render a list of options", () => {
+    // Overflow cant be properly tested, will be with playwright
+    render(
+      <OptionTrace
+        options={[
+          "apple",
+          "banana",
+          "cherry",
+          "date",
+          "fig",
+          "grape",
+          "kiwi",
+          "lemon",
+          "mango",
+        ]}
+        disableInput={false}
+        showIsSearching={false}
+        showNoOptionsFound={false}
+        showResults
+        disableResults={false}
+        showIsSubmitting={false}
+        onChange={() => {}}
+        onOptionSelect={() => {}}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox"));
+    expect(screen.getByText("apple")).toBeVisible();
+    expect(screen.getByText("banana")).toBeVisible();
+    expect(screen.getByText("cherry")).toBeVisible();
+    expect(screen.getByText("date")).toBeVisible();
+    expect(screen.getByText("fig")).toBeVisible();
+    expect(screen.getByText("grape")).toBeVisible();
+    expect(screen.getByText("kiwi")).toBeVisible();
+    expect(screen.getByText("lemon")).toBeVisible();
+    expect(screen.getByText("mango")).toBeVisible();
+  });
+
+  it("should render a message with no words found", () => {
+    render(
+      <OptionTrace
+        options={["apple", "banana", "cherry", "date"]}
+        disableInput={false}
+        showIsSearching={false}
+        showNoOptionsFound
+        showResults
+        disableResults={false}
+        showIsSubmitting={false}
+        onChange={() => {}}
+        onOptionSelect={() => {}}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole("combobox"));
+    expect(screen.getByText("No matching words found...")).toBeVisible();
   });
 });

@@ -69,6 +69,13 @@ export const IsBouncingCache: Story = {
   },
 };
 
+export const IsSubmittingAndBlockingInput: Story = {
+  args: {
+    showIsSubmitting: true,
+    disableInput: true,
+  },
+};
+
 async function fakeApi(query: string) {
   const possibleQueries = {
     a: [

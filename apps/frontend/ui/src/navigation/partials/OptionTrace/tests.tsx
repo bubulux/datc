@@ -82,4 +82,27 @@ describe("OptionTrace", () => {
 
     expect(screen.getByText("Searching, hold on...")).toBeVisible();
   });
+
+  it("should render results that are disabled (for cache bouncing)", () => {
+    render(
+      <OptionTrace
+        options={["apple", "banana", "cherry"]}
+        disableInput={false}
+        showIsSearching={false}
+        showNoOptionsFound={false}
+        showResults
+        disableResults
+        showIsSubmitting={false}
+        onChange={() => {}}
+        onOptionSelect={() => {}}
+      />,
+    );
+    fireEvent.click(screen.getByRole("combobox"));
+    expect(screen.getByText("apple")).toBeVisible();
+    expect(screen.getByText("apple")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByText("banana")).toBeVisible();
+    expect(screen.getByText("banana")).toHaveAttribute("aria-disabled", "true");
+    expect(screen.getByText("cherry")).toBeVisible();
+    expect(screen.getByText("cherry")).toHaveAttribute("aria-disabled", "true");
+  });
 });

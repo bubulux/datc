@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0b0b0d; }
+  * { box-sizing: border-box; }
+  a { color: #2fa1f2; text-decoration: none; }
+  a:hover { color: #79c4ff; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #2a2a31; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  input { font-family: inherit; }
+  @keyframes datcIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+</style>
+</helmet>
+<div style="height: 100vh; display: flex; background: #0b0b0d; color: #f1f1f3; font-family: Archivo, 'Helvetica Neue', Helvetica, sans-serif; overflow: hidden;">
+
+  <div style="width: 60px; flex: none; border-right: 1px solid #1c1c21; display: flex; flex-direction: column; align-items: center; padding: 12px 0; gap: 14px; background: #0e0e11;">
+    <div style="width: 34px; height: 34px; border-radius: 8px; background: linear-gradient(135deg, #2fa1f2, #1b6fb0); display: flex; align-items: center; justify-content: center; font-family: 'JetBrains Mono', monospace; font-size: 10px; font-weight: 500; letter-spacing: 0.02em; color: #04121d;">DATC</div>
+    <div style="width: 22px; height: 1px; background: #22222a;"></div>
+    <button onClick="{{ goBrowse }}" title="Browse" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid #1f1f26; background: {{ browseBtnBg }}; color: {{ browseBtnFg }}; font-family: 'JetBrains Mono', monospace; font-size: 13px; cursor: pointer;" style-hover="border-color: #33333d;">Br</button>
+    <button onClick="{{ goResults }}" title="Results" style="width: 36px; height: 36px; border-radius: 8px; border: 1px solid #1f1f26; background: {{ resultsBtnBg }}; color: {{ resultsBtnFg }}; font-family: 'JetBrains Mono', monospace; font-size: 13px; cursor: pointer;" style-hover="border-color: #33333d;">Re</button>
+    <div style="flex: 1;"></div>
+    <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: #4a4a55; writing-mode: vertical-rl; letter-spacing: 0.1em;">MVP 0.1</div>
+  </div>
+
+  <sc-if value="{{ isBrowse }}" hint-placeholder-val="{{ true }}">
+  <div style="flex: 1; display: flex; align-items: center; padding: 48px 56px; gap: 56px; min-width: 0;">
+    <div style="display: flex; align-items: center; flex: none;">
+      <div style="font-size: 76px; font-weight: 800; letter-spacing: -0.045em; line-height: 1;">Browse</div>
+      <div style="width: 56px; height: 1px; background: #2b2b33;"></div>
+    </div>
+    <div style="border-left: 1px solid #2b2b33; display: flex; flex-direction: column; gap: 4px; padding: 4px 0; flex: none;">
+      <sc-for list="{{ browseItems }}" as="it" hint-placeholder-count="5">
+        <div style="display: flex; align-items: center; gap: 0;">
+          <div style="width: 40px; height: 1px; background: #2b2b33;"></div>
+          <button onClick="{{ it.onClick }}" style="display: flex; align-items: center; gap: 12px; background: none; border: 0; cursor: pointer; padding: 10px 12px; font-family: inherit;">
+            <span style="width: 3px; height: 26px; border-radius: 2px; background: {{ it.bar }};"></span>
+            <span style="font-size: 34px; font-weight: 600; letter-spacing: -0.02em; color: {{ it.fg }};">{{ it.label }}</span>
+          </button>
+        </div>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ hasPanel }}">
+      <div style="width: 420px; flex: none; background: #131317; border: 1px solid #24242b; border-radius: 12px; padding: 24px; animation: datcIn 180ms ease-out;">
+        <div style="font-size: 19px; font-weight: 600; letter-spacing: -0.01em;">{{ panelTitle }}</div>
+        <div style="font-size: 13px; color: #7e7e8a; margin-top: 6px; line-height: 1.45;">{{ panelHint }}</div>
+
+        <sc-if value="{{ showConcepts }}">
+          <div style="margin-top: 18px; border: 1px solid #23232a; border-radius: 8px; padding: 6px; max-height: 260px; overflow: auto;">
+            <sc-for list="{{ conceptOpts }}" as="c" hint-placeholder-count="6">
+              <button onClick="{{ c.onClick }}" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 0; border-radius: 6px; cursor: pointer; font-family: inherit; text-align: left; background: {{ c.bg }}; color: {{ c.fg }};" style-hover="background: #1c1c22;">
+                <span style="width: 8px; height: 8px; border-radius: 2px; flex: none; background: {{ c.dot }};"></span>
+                <span style="font-size: 14px; flex: 1;">{{ c.name }}</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #5f5f6b;">{{ c.count }}</span>
+              </button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showWord }}">
+          <div style="margin-top: 18px; display: flex; flex-direction: column; gap: 12px;">
+            <input value="{{ wordQuery }}" onChange="{{ onWordQuery }}" onKeyDown="{{ onWordKey }}" placeholder="e.g. “Shard” or “Pre”" style="width: 100%; background: #0e0e12; border: 1px solid #26262e; border-radius: 8px; padding: 11px 13px; color: #f1f1f3; font-size: 14px; outline: none;" />
+            <div style="display: flex; gap: 8px;">
+              <sc-for list="{{ matchOpts }}" as="m" hint-placeholder-count="2">
+                <button onClick="{{ m.onClick }}" style="flex: 1; padding: 9px; border-radius: 8px; cursor: pointer; font-family: inherit; font-size: 13px; border: 1px solid {{ m.bd }}; background: {{ m.bg }}; color: {{ m.fg }};">{{ m.label }}</button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showRandom }}">
+          <div style="margin-top: 18px; display: flex; gap: 8px;">
+            <sc-for list="{{ randOpts }}" as="r" hint-placeholder-count="3">
+              <button onClick="{{ r.onClick }}" style="flex: 1; padding: 9px; border-radius: 8px; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 13px; border: 1px solid {{ r.bd }}; background: {{ r.bg }}; color: {{ r.fg }};">{{ r.label }}</button>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showFilter }}">
+          <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 18px; max-height: 400px; overflow: auto;">
+            <div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: #6d6d79; text-transform: uppercase;">Type</div>
+              <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                <sc-for list="{{ typeOpts }}" as="t" hint-placeholder-count="3">
+                  <button onClick="{{ t.onClick }}" style="padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 13px; border: 1px solid {{ t.bd }}; background: {{ t.bg }}; color: {{ t.fg }};">{{ t.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: #6d6d79; text-transform: uppercase;">Concepts</div>
+              <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                <sc-for list="{{ filterConceptOpts }}" as="c" hint-placeholder-count="8">
+                  <button onClick="{{ c.onClick }}" style="padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 13px; border: 1px solid {{ c.bd }}; background: {{ c.bg }}; color: {{ c.fg }};">{{ c.name }}</button>
+                </sc-for>
+              </div>
+            </div>
+            <div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.12em; color: #6d6d79; text-transform: uppercase;">Must have</div>
+              <div style="display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap;">
+                <sc-for list="{{ reqOpts }}" as="q" hint-placeholder-count="3">
+                  <button onClick="{{ q.onClick }}" style="padding: 7px 12px; border-radius: 999px; cursor: pointer; font-family: inherit; font-size: 13px; border: 1px solid {{ q.bd }}; background: {{ q.bg }}; color: {{ q.fg }};">{{ q.label }}</button>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+        </sc-if>
+
+        <div style="display: flex; align-items: center; gap: 12px; margin-top: 22px;">
+          <div style="flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6d6d79;">{{ panelCount }}</div>
+          <button onClick="{{ runSearch }}" style="padding: 11px 26px; border-radius: 8px; border: 0; cursor: pointer; font-family: inherit; font-size: 14px; font-weight: 600; background: #2fa1f2; color: #06131e;" style-hover="background: #55b4f6;">{{ panelCta }}</button>
+        </div>
+      </div>
+    </sc-if>
+  </div>
+  </sc-if>
+
+  <sc-if value="{{ isResults }}">
+  <div style="flex: 1; display: flex; min-width: 0;">
+
+    <div style="width: 300px; flex: none; border-right: 1px solid #1c1c21; display: flex; flex-direction: column; background: #0e0e11;">
+      <div style="padding: 18px 16px 12px;">
+        <div style="display: flex; align-items: baseline; gap: 8px;">
+          <div style="font-size: 20px; font-weight: 700; letter-spacing: -0.02em;">Results</div>
+          <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6d6d79;">{{ resultCount }}</div>
+        </div>
+        <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #6d6d79; margin-top: 4px;">{{ queryLabel }}</div>
+        <input value="{{ listFilter }}" onChange="{{ onListFilter }}" placeholder="filter these results…" style="width: 100%; margin-top: 12px; background: #131317; border: 1px solid #24242b; border-radius: 8px; padding: 9px 12px; color: #f1f1f3; font-size: 13px; outline: none;" />
+      </div>
+      <div style="flex: 1; overflow: auto; padding: 0 8px 8px;">
+        <sc-for list="{{ results }}" as="r" hint-placeholder-count="14">
+          <button onClick="{{ r.onClick }}" style="width: 100%; display: flex; align-items: center; gap: 10px; padding: 8px 10px; border: 0; border-radius: 6px; cursor: pointer; font-family: inherit; text-align: left; background: {{ r.bg }};" style-hover="background: #17171c;">
+            <span style="width: 6px; height: 6px; border-radius: 999px; flex: none; background: {{ r.dot }};"></span>
+            <span style="font-size: 14px; flex: 1; color: {{ r.fg }};">{{ r.word }}</span>
+            <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #55555f;">{{ r.type }}</span>
+          </button>
+        </sc-for>
+        <sc-if value="{{ noResults }}">
+          <div style="padding: 24px 12px; font-size: 13px; color: #6d6d79; line-height: 1.5;">No words match. Start a new search from Browse.</div>
+        </sc-if>
+      </div>
+      <div style="border-top: 1px solid #1c1c21; padding: 10px; display: flex; gap: 8px; position: relative;">
+        <button onClick="{{ goBrowse }}" style="flex: 1; padding: 9px; border-radius: 8px; border: 1px solid #24242b; background: #131317; color: #cfcfd6; font-family: inherit; font-size: 13px; cursor: pointer;" style-hover="border-color: #33333d;">New search</button>
+        <button onClick="{{ toggleHistory }}" style="flex: 1; padding: 9px; border-radius: 8px; border: 1px solid #24242b; background: #131317; color: #cfcfd6; font-family: inherit; font-size: 13px; cursor: pointer;" style-hover="border-color: #33333d;">History</button>
+        <sc-if value="{{ historyOpen }}">
+          <div style="position: absolute; bottom: 56px; left: 10px; right: 10px; background: #17171c; border: 1px solid #2a2a32; border-radius: 10px; padding: 6px; box-shadow: 0 16px 40px rgba(0,0,0,0.55); animation: datcIn 140ms ease-out; max-height: 260px; overflow: auto;">
+            <sc-for list="{{ history }}" as="h" hint-placeholder-count="3">
+              <button onClick="{{ h.onClick }}" style="width: 100%; display: flex; align-items: center; gap: 8px; padding: 8px 10px; border: 0; background: none; border-radius: 6px; cursor: pointer; font-family: inherit; text-align: left;" style-hover="background: #202027;">
+                <span style="font-size: 13px; color: #b9b9c2; flex: 1;">{{ h.label }}</span>
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #2fa1f2;">{{ h.count }}</span>
+              </button>
+            </sc-for>
+            <sc-if value="{{ noHistory }}">
+              <div style="padding: 12px; font-size: 12px; color: #6d6d79;">No searches yet.</div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <div style="flex: 1; display: flex; flex-direction: column; min-width: 0;">
+      <div style="display: flex; align-items: stretch; gap: 6px; padding: 10px 12px 0; overflow-x: auto; border-bottom: 1px solid #1c1c21;">
+        <sc-for list="{{ tabs }}" as="t" hint-placeholder-count="3">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 9px 10px 9px 14px; border-radius: 8px 8px 0 0; flex: none; border: 1px solid {{ t.bd }}; border-bottom: 0; background: {{ t.bg }};">
+            <button onClick="{{ t.onSelect }}" style="border: 0; background: none; cursor: pointer; font-family: inherit; font-size: 13px; padding: 0; color: {{ t.fg }};">{{ t.word }}</button>
+            <button onClick="{{ t.onClose }}" style="border: 0; background: none; cursor: pointer; font-family: 'JetBrains Mono', monospace; font-size: 12px; padding: 0 2px; line-height: 1; color: #5f5f6b;" style-hover="color: #f1f1f3;">✕</button>
+          </div>
+        </sc-for>
+        <sc-if value="{{ noTabs }}">
+          <div style="padding: 10px 4px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4d4d57;">no open words</div>
+        </sc-if>
+      </div>
+
+      <div style="flex: 1; overflow: auto; padding: 40px 40px 64px;">
+        <sc-if value="{{ hasActive }}">
+          <div style="max-width: 760px; margin: 0 auto;">
+            <div style="text-align: center; font-size: 60px; font-weight: 800; letter-spacing: -0.04em; text-transform: uppercase; line-height: 1;">{{ active.word }}</div>
+            <div style="height: 1px; background: #1f1f26; margin: 32px 0 0;"></div>
+
+            <div style="display: flex; gap: 20px; padding: 18px 0; border-bottom: 1px solid #1f1f26; align-items: center;">
+              <div style="width: 130px; flex: none; font-size: 15px; font-weight: 600; color: #8d8d99;">Type</div>
+              <div style="padding: 5px 12px; border-radius: 6px; font-size: 13px; font-weight: 600; background: {{ active.typeBg }}; color: {{ active.typeFg }};">{{ active.type }}</div>
+            </div>
+
+            <div style="display: flex; gap: 20px; padding: 18px 0; border-bottom: 1px solid #1f1f26; align-items: flex-start;">
+              <div style="width: 130px; flex: none; font-size: 15px; font-weight: 600; color: #8d8d99; padding-top: 4px;">Concepts</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                <sc-for list="{{ active.concepts }}" as="c" hint-placeholder-count="2">
+                  <button onClick="{{ c.onClick }}" style="display: flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 6px; border: 1px solid #2b3d4c; background: #12222e; color: #9fd4fb; font-family: inherit; font-size: 13px; cursor: pointer;" style-hover="border-color: #2fa1f2;">
+                    <span style="width: 7px; height: 7px; border-radius: 2px; background: #2fa1f2;"></span>{{ c.name }}
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; padding: 18px 0; border-bottom: 1px solid #1f1f26; align-items: flex-start;">
+              <div style="width: 130px; flex: none; font-size: 15px; font-weight: 600; color: #8d8d99; padding-top: 4px;">Variants</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; flex: 1;">
+                <sc-for list="{{ active.variants }}" as="v" hint-placeholder-count="3">
+                  <span style="padding: 6px 12px; border-radius: 6px; background: #17171c; border: 1px solid #24242b; color: #c6c6cf; font-size: 13px; font-family: 'JetBrains Mono', monospace;">{{ v.label }}</span>
+                </sc-for>
+                <sc-if value="{{ active.noVariants }}"><span style="font-size: 13px; color: #55555f;">—</span></sc-if>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; padding: 18px 0; border-bottom: 1px solid #1f1f26; align-items: flex-start;">
+              <div style="width: 130px; flex: none; font-size: 15px; font-weight: 600; color: #8d8d99; padding-top: 4px;">Synonyms</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; flex: 1;">
+                <sc-for list="{{ active.synonyms }}" as="s" hint-placeholder-count="3">
+                  <button onClick="{{ s.onClick }}" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-family: inherit; cursor: {{ s.cursor }}; border: 1px solid {{ s.bd }}; background: #17171c; color: {{ s.fg }};" style-hover="border-color: #3a3a45;">{{ s.label }}</button>
+                </sc-for>
+                <sc-if value="{{ active.noSynonyms }}"><span style="font-size: 13px; color: #55555f;">—</span></sc-if>
+              </div>
+            </div>
+
+            <div style="display: flex; gap: 20px; padding: 18px 0; border-bottom: 1px solid #1f1f26; align-items: flex-start;">
+              <div style="width: 130px; flex: none; font-size: 15px; font-weight: 600; color: #8d8d99; padding-top: 4px;">Antagonists</div>
+              <div style="display: flex; flex-wrap: wrap; gap: 8px; flex: 1;">
+                <sc-for list="{{ active.antagonists }}" as="a" hint-placeholder-count="2">
+                  <button onClick="{{ a.onClick }}" style="padding: 6px 12px; border-radius: 6px; font-size: 13px; font-family: inherit; cursor: {{ a.cursor }}; border: 1px solid {{ a.bd }}; background: #1c1417; color: {{ a.fg }};" style-hover="border-color: #6b3a42;">{{ a.label }}</button>
+                </sc-for>
+                <sc-if value="{{ active.noAntagonists }}"><span style="font-size: 13px; color: #55555f;">—</span></sc-if>
+              </div>
+            </div>
+
+            <div style="margin-top: 18px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #4d4d57;">{{ active.meta }}</div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ noTabs }}">
+          <div style="height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; color: #4d4d57;">
+            <div style="width: 40px; height: 40px; border: 1px solid #26262e; border-radius: 10px;"></div>
+            <div style="font-size: 14px;">Pick a word from the list</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px;">it opens as a tab — keep several side by side</div>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+  </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+const RAW = [
+["Successor","Noun","Hierarchy",["successor node","direct successor"],["heir","next","follower"],["predecessor"]],
+["Predecessor","Noun","Hierarchy",["immediate predecessor"],["ancestor","prior"],["successor"]],
+["Parent","Noun","Hierarchy",["parent node","reparent"],["owner","container"],["child","orphan"]],
+["Sibling","Noun","Hierarchy",["sibling set"],["peer","neighbour"],["parent"]],
+["Child","Noun","Hierarchy",["child node","childless"],["descendant","leaf"],["parent"]],
+["Orphan","Noun","Hierarchy|Lifecycle",["orphaned","adopt"],["dangling","unreferenced"],["parent","adopt"]],
+["Tree","Noun","Hierarchy",["subtree","forest"],["hierarchy","graph"],["flat","list"]],
+["Leaf","Noun","Hierarchy",["leaf node"],["terminal","tip"],["root","branch"]],
+["Branch","Noun","Hierarchy",["branching","branchless"],["fork","split"],["merge","trunk"]],
+["Fork","Verb","Hierarchy|Lifecycle",["forked","fork point"],["split","branch"],["join","merge"]],
+["Promote","Verb","Hierarchy",["promotion","self-promote"],["elevate","raise"],["demote"]],
+["Demote","Verb","Hierarchy",["demotion"],["downgrade","lower"],["promote"]],
+["Age","Noun","Lifecycle",["ageing","aged"],["maturity","lifetime"],["fresh"]],
+["Spawn","Verb","Lifecycle",["spawner","respawn"],["create","fork","hatch"],["reap","destroy"]],
+["Create","Verb","Lifecycle",["creation","creator"],["allocate","construct"],["destroy"]],
+["Destroy","Verb","Lifecycle",["destruction","self-destruct"],["tear down","dispose"],["create"]],
+["Zombie","Noun","Lifecycle",["zombified"],["stale","undead","orphan"],["reaped","live"]],
+["Rotten","Adjective","Lifecycle",["rot","rotting"],["stale","decayed"],["fresh","sound"]],
+["Hydration","Noun","Lifecycle|Transformability",["hydrate","rehydrate","dehydrate"],["rehydration","revive"],["dehydration"]],
+["Upgrade","Verb","Lifecycle",["upgraded","in-place upgrade"],["migrate","advance"],["downgrade","rollback"]],
+["Downgrade","Verb","Lifecycle",["downgraded"],["rollback","regress"],["upgrade"]],
+["Edition","Noun","Traceability",["editioned"],["release","revision"],[]],
+["Version","Noun","Traceability",["versioning","versioned"],["revision","edition"],[]],
+["Mount","Verb","Connectivity|Lifecycle",["mounted","remount"],["attach","bind"],["unmount","detach"]],
+["Unmount","Verb","Connectivity|Lifecycle",["unmounted"],["detach","release"],["mount"]],
+["Evacuate","Verb","Resource",["evacuation"],["drain","vacate"],["admit","populate"]],
+["Signal","Noun","Signaling",["signaller","signalling"],["notify","emit","raise"],["silence","mute"]],
+["Message","Noun","Signaling",["messaging","message bus"],["packet","envelope","payload"],["silence"]],
+["Messenger","Noun","Signaling",["courier"],["carrier","broker"],["receiver"]],
+["Dispatch","Verb","Signaling",["dispatcher","re-dispatch"],["route","send","emit"],["collect","receive"]],
+["Propose","Verb","Signaling|Assurance",["proposal","proposer"],["offer","suggest"],["reject","veto"]],
+["Call","Verb","Signaling",["callee","caller","callback"],["invoke","apply"],["return"]],
+["Subscribe","Verb","Signaling",["subscriber","subscription"],["listen","observe","watch"],["unsubscribe","publish"]],
+["Consume","Verb","Signaling|Resource",["consumer","consumption"],["read","drain","absorb"],["produce","supply"]],
+["Sender","Noun","Signaling",["send","resend"],["producer","publisher"],["receiver"]],
+["Receiver","Noun","Signaling",["receive","reception"],["consumer","sink"],["sender"]],
+["Channel","Noun","Signaling|Connectivity",["channelled","multi-channel"],["pipe","stream","conduit"],["barrier"]],
+["Bus","Noun","Signaling|Connectivity",["bus line","event bus"],["backbone","broker"],["point-to-point"]],
+["Interpreter","Noun","Transformability",["interpretation","interpret"],["evaluator","reader"],["compiler"]],
+["Partial","Adjective","Partiality",["partially","partition"],["incomplete","fragmentary"],["whole","total"]],
+["Chunk","Noun","Partiality",["chunked","chunking"],["block","segment","slice"],["whole","stream"]],
+["Shard","Noun","Partiality",["sharded","sharding"],["partition","split","piece"],["whole","merge"]],
+["Aggregate","Verb","Partiality",["aggregation","aggregator"],["combine","gather","roll up"],["scatter","split"]],
+["Reduce","Verb","Partiality|Transformability",["reduction","reducer"],["fold","collapse","summarize"],["expand","map"]],
+["Summarize","Verb","Partiality",["summary"],["condense","digest"],["expand","detail"]],
+["Accumulate","Verb","Partiality|Resource",["accumulator","accumulation"],["gather","build up"],["flush","drain"]],
+["Module","Noun","Partiality",["modular","modularity"],["unit","component"],["monolith"]],
+["Compound","Noun","Partiality",["compounded","compounding"],["composite","aggregate"],["atomic","primitive"]],
+["Attach","Verb","Connectivity",["attachment","reattach"],["bind","couple","mount"],["detach"]],
+["Detach","Verb","Connectivity",["detachment","detached"],["unbind","release"],["attach"]],
+["Wire","Verb","Connectivity",["wiring","rewire","wired"],["connect","link","bind"],["unwire","sever"]],
+["Fiber","Noun","Connectivity",["fibrous","fiber tree"],["thread","strand"],["bulk"]],
+["Rail","Noun","Connectivity",["railed","guardrail"],["track","lane","guide"],["freeform"]],
+["Mediator","Noun","Connectivity",["mediate","mediation"],["broker","arbiter","hub"],["peer-to-peer"]],
+["Station","Noun","Connectivity",["stationed","stationing"],["node","stop","post"],["transit"]],
+["Convert","Verb","Transformability",["conversion","converter"],["transform","cast","map"],["preserve"]],
+["Transform","Verb","Transformability",["transformation","transformer"],["convert","reshape","morph"],["identity","preserve"]],
+["Adapt","Verb","Transformability",["adapter","adaptation"],["fit","wrap","bridge"],["reject","break"]],
+["Update","Verb","Transformability|Lifecycle",["updated","in-place update"],["mutate","refresh","patch"],["freeze","stale"]],
+["Derivation","Noun","Transformability",["derive","derived"],["inference","descent"],["origin","axiom"]],
+["Starvation","Noun","Resource",["starved","starving"],["famine","deprivation"],["feed","satiate"]],
+["Feed","Verb","Resource",["feeder","feeding"],["supply","fuel","nourish"],["starve","drain"]],
+["Drain","Verb","Resource",["drained","draining"],["deplete","exhaust","empty"],["fill","feed"]],
+["Leak","Noun","Resource",["leaky","leaking"],["seep","bleed","escape"],["seal","contain"]],
+["Bleed","Verb","Resource",["bleeding","bleed-through"],["leak","seep"],["contain","seal"]],
+["Pool","Noun","Resource",["pooled","pooling"],["reservoir","cache","bank"],["scatter","dispose"]],
+["Tenant","Noun","Resource|Access",["tenancy","multi-tenant"],["occupant","resident"],["landlord","evict"]],
+["Dilution","Noun","Resource",["dilute","diluted"],["thinning","weakening"],["concentration"]],
+["Guarantee","Noun","Assurance",["guaranteed","guarantor"],["warranty","assurance","promise"],["violation","breach"]],
+["Assert","Verb","Assurance",["assertion"],["claim","affirm","enforce"],["deny","doubt"]],
+["Contract","Noun","Assurance",["contractual","subcontract"],["agreement","protocol","interface"],["breach","violation"]],
+["Proof","Noun","Assurance",["prove","provable"],["evidence","witness"],["conjecture","doubt"]],
+["Validation","Noun","Assurance",["validate","validator"],["verification","check"],["violation","pollution"]],
+["Violation","Noun","Assurance",["violate","violator"],["breach","transgression"],["compliance","validation"]],
+["Accusation","Noun","Assurance",["accuse","accuser"],["allegation","blame","charge"],["defence","exoneration"]],
+["Allege","Verb","Assurance",["allegation","alleged"],["accuse","claim"],["prove","confirm"]],
+["Blame","Verb","Assurance|Traceability",["blameless","blame trail"],["fault","attribute","accuse"],["credit","absolve"]],
+["Claim","Noun","Assurance|Access",["claimed","reclaim","unclaimed"],["assertion","stake","reservation"],["release","waive"]],
+["Enforce","Verb","Assurance",["enforcement","enforcer"],["compel","uphold","police"],["permit","relax"]],
+["Pollution","Noun","Assurance",["pollute","polluted"],["contamination","taint"],["purity","cleanliness"]],
+["Protocol","Noun","Assurance|Signaling",["protocolled"],["contract","convention"],["ad hoc"]],
+["Key","Noun","Access",["keyed","keyless","keyring"],["token","handle","credential"],["lock"]],
+["Admit","Verb","Access",["admission","admitted"],["accept","allow","enter"],["reject","evict"]],
+["Include","Verb","Access",["inclusion","inclusive"],["contain","admit"],["exclude"]],
+["Exclude","Verb","Access",["exclusion","exclusive"],["omit","reject","filter out"],["include"]],
+["Public","Adjective","Access",["publicly","publish"],["open","exposed","external"],["private","internal"]],
+["Private","Adjective","Access",["privately","privacy"],["closed","hidden","internal"],["public","external"]],
+["Internal","Adjective","Access",["internally","internals"],["private","inner"],["external"]],
+["External","Adjective","Access",["externally","externalize"],["outer","foreign","public"],["internal","domestic"]],
+["Guard","Noun","Access",["guarded","guard clause"],["sentinel","gate","check"],["breach","bypass"]],
+["Boundary","Noun","Access",["bound","bounded","unbounded"],["limit","edge","perimeter"],["breach","unbounded"]],
+["Breach","Verb","Access",["breached","breach point"],["violate","penetrate","cross"],["contain","seal"]],
+["Blocking","Adjective","Access",["block","unblock","blocked"],["halting","waiting"],["non-blocking","free"]],
+["Exit","Verb","Access|Lifecycle",["exited","exit code"],["leave","terminate","escape"],["enter","admit"]],
+["Stranger","Noun","Access",["strange","estrange"],["foreigner","outsider","untrusted"],["domestic","known"]],
+["Aggressive","Adjective","Disposition",["aggression","aggressively"],["eager","greedy","forceful"],["passive","lazy"]],
+["Active","Adjective","Disposition",["activate","activity"],["live","running","hot"],["passive","idle"]],
+["Passive","Adjective","Disposition",["passively","passivity"],["idle","reactive","dormant"],["active","aggressive"]],
+["Strong","Adjective","Disposition|Assurance",["strengthen","strength"],["hard","firm","tight"],["weak"]],
+["Weak",  "Adjective","Disposition|Assurance",["weaken","weakness"],["soft","loose","lax"],["strong","tight"]],
+["Safe","Adjective","Disposition|Assurance",["safety","unsafe"],["sound","secure","guarded"],["unsafe","exposed"]],
+["Penalty","Noun","Disposition",["penalize","penalized"],["cost","punishment","fine"],["reward","credit"]],
+["Puppet","Noun","Disposition",["puppeteer","puppetry"],["proxy","stand-in","marionette"],["autonomous","actor"]],
+["Actor","Noun","Disposition",["act","acting","enact"],["agent","participant"],["puppet","observer"]],
+["Trail","Noun","Traceability",["trailing","trailhead"],["path","log","breadcrumb"],["gap","void"]],
+["Trace","Verb","Traceability",["tracing","traceable"],["follow","track","log"],["obscure","erase"]],
+["Tracker","Noun","Traceability",["track","tracking"],["monitor","watcher"],["blind spot"]],
+["Track","Verb","Traceability",["tracking","untracked"],["follow","record","trace"],["ignore","drop"]]
+];
+
+const CONCEPT_ORDER = ["Hierarchy","Lifecycle","Signaling","Partiality","Connectivity","Transformability","Resource","Assurance","Access","Disposition","Traceability"];
+
+const TYPE_COLORS = {
+  Noun: { bg: "#12222e", fg: "#8fcdfb", dot: "#2fa1f2" },
+  Verb: { bg: "#2a2410", fg: "#f2ce62", dot: "#e0b53c" },
+  Adjective: { bg: "#221a2e", fg: "#c8a6f5", dot: "#9b6ff0" }
+};
+
+class Component extends DCLogic {
+  state = {
+    screen: "browse",
+    browseSel: null,
+    concept: null,
+    wordQuery: "",
+    match: "Contains",
+    randomN: 8,
+    fTypes: [],
+    fConcepts: [],
+    fReq: [],
+    results: [],
+    queryLabel: "",
+    listFilter: "",
+    tabs: [],
+    active: null,
+    history: [],
+    historyOpen: false
+  };
+
+  words = RAW.map(function (r) {
+    return { word: r[0], type: r[1], concepts: r[2].split("|"), variants: r[3], synonyms: r[4], antagonists: r[5] };
+  });
+
+  find(w) {
+    const k = String(w).toLowerCase();
+    return this.words.find(function (x) { return x.word.toLowerCase() === k; });
+  }
+
+  openWord(word, push) {
+    const w = typeof word === "string" ? this.find(word) : word;
+    if (!w) return;
+    this.setState(function (s) {
+      const tabs = s.tabs.indexOf(w.word) >= 0 ? s.tabs : s.tabs.concat([w.word]).slice(-8);
+      return { tabs: tabs, active: w.word, screen: "results", historyOpen: false };
+    });
+  }
+
+  search(label, list) {
+    const entry = { label: label, count: list.length };
+    this.setState(function (s) {
+      return {
+        screen: "results",
+        results: list.map(function (w) { return w.word; }),
+        queryLabel: label,
+        listFilter: "",
+        history: [entry].concat(s.history).slice(0, 12),
+        historyOpen: false
+      };
+    });
+  }
+
+  runSearch = () => {
+    const s = this.state;
+    const all = this.words;
+    if (s.browseSel === "Catalogue") return this.search("Catalogue · all words", all.slice().sort(function (a, b) { return a.word.localeCompare(b.word); }));
+    if (s.browseSel === "Concepts") {
+      if (!s.concept) return;
+      const c = s.concept;
+      return this.search("Concept · " + c, all.filter(function (w) { return w.concepts.indexOf(c) >= 0; }));
+    }
+    if (s.browseSel === "Random") {
+      const pool = all.slice();
+      for (let i = pool.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); const t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+      return this.search("Random · " + s.randomN, pool.slice(0, s.randomN));
+    }
+    if (s.browseSel === "Word") {
+      const q = s.wordQuery.trim().toLowerCase();
+      if (!q) return;
+      const exact = s.match === "Exact";
+      const hit = all.filter(function (w) {
+        const hay = [w.word].concat(w.variants, w.synonyms).join(" ").toLowerCase();
+        return exact ? w.word.toLowerCase() === q : hay.indexOf(q) >= 0;
+      });
+      return this.search("Word · " + (exact ? "exact " : "contains ") + "“" + s.wordQuery.trim() + "”", hit);
+    }
+    if (s.browseSel === "Filter") {
+      const hit = all.filter(function (w) {
+        if (s.fTypes.length && s.fTypes.indexOf(w.type) < 0) return false;
+        if (s.fConcepts.length && !w.concepts.some(function (c) { return s.fConcepts.indexOf(c) >= 0; })) return false;
+        if (s.fReq.indexOf("Variants") >= 0 && !w.variants.length) return false;
+        if (s.fReq.indexOf("Synonyms") >= 0 && !w.synonyms.length) return false;
+        if (s.fReq.indexOf("Antagonists") >= 0 && !w.antagonists.length) return false;
+        return true;
+      });
+      const bits = [].concat(s.fTypes, s.fConcepts, s.fReq.map(function (r) { return "has " + r.toLowerCase(); }));
+      return this.search("Filter · " + (bits.length ? bits.join(", ") : "all"), hit);
+    }
+  };
+
+  toggle(key, val) {
+    this.setState(function (s) {
+      const arr = s[key];
+      const next = arr.indexOf(val) >= 0 ? arr.filter(function (x) { return x !== val; }) : arr.concat([val]);
+      const o = {}; o[key] = next; return o;
+    });
+  }
+
+  chip(sel) {
+    return sel
+      ? { bg: "#12222e", fg: "#9fd4fb", bd: "#2fa1f2" }
+      : { bg: "#17171c", fg: "#a9a9b4", bd: "#26262e" };
+  }
+
+  tagFor(label) {
+    const known = !!this.find(label);
+    const self = this;
+    return {
+      label: label,
+      known: known,
+      cursor: known ? "pointer" : "default",
+      onClick: known ? function () { self.openWord(label); } : function () {},
+      bd: known ? "#2f2f3a" : "#1f1f26"
+    };
+  }
+
+  renderVals() {
+    const self = this;
+    const s = this.state;
+    const counts = {};
+    CONCEPT_ORDER.forEach(function (c) {
+      counts[c] = self.words.filter(function (w) { return w.concepts.indexOf(c) >= 0; }).length;
+    });
+
+    const panelCopy = {
+      Catalogue: ["The entire catalogue", "Every mapped word, alphabetical. Paginated in the real build.", "Continue"],
+      Concepts: ["Search by concept", "Pick one recognizable concept to pull its words.", "Search"],
+      Random: ["Draw at random", "How many unfamiliar words do you want served?", "Draw"],
+      Word: ["Target a word", "Match the word itself, its variants and synonyms.", "Search"],
+      Filter: ["Build a query", "Combine type, concept and required properties.", "Search"]
+    };
+    const copy = panelCopy[s.browseSel] || ["", "", "Search"];
+
+    let panelCount = "";
+    if (s.browseSel === "Catalogue") panelCount = this.words.length + " words";
+    if (s.browseSel === "Concepts") panelCount = s.concept ? counts[s.concept] + " words" : "select a concept";
+    if (s.browseSel === "Random") panelCount = "of " + this.words.length;
+    if (s.browseSel === "Filter") panelCount = (s.fTypes.length + s.fConcepts.length + s.fReq.length) + " criteria";
+
+    const lf = s.listFilter.trim().toLowerCase();
+    const results = s.results
+      .map(function (w) { return self.find(w); })
+      .filter(function (w) { return w && (!lf || w.word.toLowerCase().indexOf(lf) >= 0); })
+      .map(function (w) {
+        const sel = s.active === w.word;
+        return {
+          word: w.word,
+          type: w.type.slice(0, 3).toLowerCase(),
+          dot: TYPE_COLORS[w.type].dot,
+          bg: sel ? "#1b1b21" : "transparent",
+          fg: sel ? "#ffffff" : "#b4b4be",
+          onClick: function () { self.openWord(w); }
+        };
+      });
+
+    const aw = this.find(s.active || "");
+    let active = null;
+    if (aw) {
+      const tc = TYPE_COLORS[aw.type];
+      active = {
+        word: aw.word,
+        type: aw.type,
+        typeBg: tc.bg,
+        typeFg: tc.fg,
+        concepts: aw.concepts.map(function (c) {
+          return { name: c, onClick: function () { self.setState({ browseSel: "Concepts", concept: c }); self.search("Concept · " + c, self.words.filter(function (w) { return w.concepts.indexOf(c) >= 0; })); } };
+        }),
+        variants: aw.variants.map(function (v) { return { label: v }; }),
+        synonyms: aw.synonyms.map(function (x) { const t = self.tagFor(x); t.fg = t.known ? "#dcdce3" : "#83838f"; return t; }),
+        antagonists: aw.antagonists.map(function (x) { const t = self.tagFor(x); t.fg = t.known ? "#f2a9b3" : "#967077"; t.bd = t.known ? "#4a2a31" : "#2a1c20"; return t; }),
+        noVariants: aw.variants.length === 0,
+        noSynonyms: aw.synonyms.length === 0,
+        noAntagonists: aw.antagonists.length === 0,
+        meta: aw.concepts.join(" / ").toLowerCase() + " · " + aw.variants.length + " variants · " + aw.synonyms.length + " synonyms · " + aw.antagonists.length + " antagonists"
+      };
+    }
+
+    return {
+      isBrowse: s.screen === "browse",
+      isResults: s.screen === "results",
+      goBrowse: function () { self.setState({ screen: "browse", historyOpen: false }); },
+      goResults: function () { self.setState({ screen: "results" }); },
+      browseBtnBg: s.screen === "browse" ? "#12222e" : "#131317",
+      browseBtnFg: s.screen === "browse" ? "#7cc6fb" : "#7e7e8a",
+      resultsBtnBg: s.screen === "results" ? "#12222e" : "#131317",
+      resultsBtnFg: s.screen === "results" ? "#7cc6fb" : "#7e7e8a",
+
+      browseItems: ["Catalogue", "Concepts", "Random", "Word", "Filter"].map(function (label) {
+        const sel = s.browseSel === label;
+        return {
+          label: label,
+          bar: sel ? "#2fa1f2" : "transparent",
+          fg: sel ? "#ffffff" : "#9a9aa5",
+          onClick: function () { self.setState({ browseSel: label }); }
+        };
+      }),
+      hasPanel: !!s.browseSel,
+      panelTitle: copy[0],
+      panelHint: copy[1],
+      panelCta: copy[2],
+      panelCount: panelCount,
+      showConcepts: s.browseSel === "Concepts",
+      showWord: s.browseSel === "Word",
+      showRandom: s.browseSel === "Random",
+      showFilter: s.browseSel === "Filter",
+
+      conceptOpts: CONCEPT_ORDER.map(function (c) {
+        const sel = s.concept === c;
+        return { name: c, count: counts[c], dot: sel ? "#2fa1f2" : "#3a3a45", bg: sel ? "#12222e" : "transparent", fg: sel ? "#ffffff" : "#b4b4be", onClick: function () { self.setState({ concept: c }); } };
+      }),
+      wordQuery: s.wordQuery,
+      onWordQuery: function (e) { self.setState({ wordQuery: e.target.value }); },
+      onWordKey: function (e) { if (e.key === "Enter") self.runSearch(); },
+      matchOpts: ["Exact", "Contains"].map(function (m) {
+        const c = self.chip(s.match === m);
+        return { label: m, bg: c.bg, fg: c.fg, bd: c.bd, onClick: function () { self.setState({ match: m }); } };
+      }),
+      randOpts: [5, 8, 20].map(function (n) {
+        const c = self.chip(s.randomN === n);
+        return { label: String(n), bg: c.bg, fg: c.fg, bd: c.bd, onClick: function () { self.setState({ randomN: n }); } };
+      }),
+      typeOpts: ["Noun", "Verb", "Adjective"].map(function (t) {
+        const c = self.chip(s.fTypes.indexOf(t) >= 0);
+        return { label: t, bg: c.bg, fg: c.fg, bd: c.bd, onClick: function () { self.toggle("fTypes", t); } };
+      }),
+      filterConceptOpts: CONCEPT_ORDER.map(function (t) {
+        const c = self.chip(s.fConcepts.indexOf(t) >= 0);
+        return { name: t, bg: c.bg, fg: c.fg, bd: c.bd, onClick: function () { self.toggle("fConcepts", t); } };
+      }),
+      reqOpts: ["Variants", "Synonyms", "Antagonists"].map(function (t) {
+        const c = self.chip(s.fReq.indexOf(t) >= 0);
+        return { label: t, bg: c.bg, fg: c.fg, bd: c.bd, onClick: function () { self.toggle("fReq", t); } };
+      }),
+      runSearch: this.runSearch,
+
+      results: results,
+      noResults: results.length === 0,
+      resultCount: s.results.length ? s.results.length + " words" : "",
+      queryLabel: s.queryLabel || "no search yet",
+      listFilter: s.listFilter,
+      onListFilter: function (e) { self.setState({ listFilter: e.target.value }); },
+      historyOpen: s.historyOpen,
+      toggleHistory: function () { self.setState(function (p) { return { historyOpen: !p.historyOpen }; }); },
+      history: s.history.map(function (h) {
+        return { label: h.label, count: h.count, onClick: function () { self.setState({ historyOpen: false }); } };
+      }),
+      noHistory: s.history.length === 0,
+
+      tabs: s.tabs.map(function (w) {
+        const sel = s.active === w;
+        return {
+          word: w,
+          bg: sel ? "#151519" : "transparent",
+          bd: sel ? "#24242b" : "transparent",
+          fg: sel ? "#ffffff" : "#8a8a95",
+          onSelect: function () { self.setState({ active: w }); },
+          onClose: function () {
+            self.setState(function (p) {
+              const tabs = p.tabs.filter(function (x) { return x !== w; });
+              return { tabs: tabs, active: p.active === w ? (tabs[tabs.length - 1] || null) : p.active };
+            });
+          }
+        };
+      }),
+      noTabs: s.tabs.length === 0,
+      hasActive: !!active,
+      active: active
+    };
+  }
+}
+
+</script>
+</body>
+</html>

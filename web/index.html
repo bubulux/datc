@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DATC — Dictionary of Abstraction Terms for Code</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #0b0b0d; }
+  * { box-sizing: border-box; }
+  a { color: #2fa1f2; text-decoration: none; }
+  a:hover { color: #79c4ff; }
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #2a2a31; border-radius: 4px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  input { font-family: inherit; }
+  button { font-family: inherit; }
+  @keyframes datcIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .datc-hoverable:hover { border-color: #33333d !important; }
+  .datc-row:hover { background: #1c1c22 !important; }
+  .datc-listrow:hover { background: #17171c !important; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="./data.js"></script>
+<script src="./app.js"></script>
+</body>
+</html>

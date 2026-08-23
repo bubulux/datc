@@ -1,8 +1,0 @@
-{
-  "extends": "../../../../tsconfig.frontend.json",
-  "compilerOptions": {
-    // needed for ts-node / jest for transpiling tsconfig paths
-    "resolveJsonModule": true,
-    "esModuleInterop": true
-  }
-}

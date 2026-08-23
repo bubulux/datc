@@ -13,6 +13,9 @@ storage/            # source of truth (normalized YAML "tables")
 scripts/
   validate.py       # schema + referential-integrity check (CI-ready)
   build.py          # bridge: storage/ -> web/data.js
+  admin.py          # local CRUD server + UI for editing storage/
+admin/
+  index.html        # admin UI (served by admin.py)
 web/
   index.html        # the app shell
   app.js            # dependency-free UI (ported from the DC design prototype)
@@ -34,6 +37,24 @@ schemas and constraints.
 `web/data.js` is a generated artifact committed for convenience (so the app is
 runnable on clone). Always regenerate it with `build.py` after changing
 `storage/`; never edit it by hand.
+
+## Editing storage (admin UI)
+
+Instead of hand-editing YAML you can run the local admin tool:
+
+```
+python3 scripts/admin.py     # -> http://127.0.0.1:8765
+```
+
+It serves a CRUD UI over both tables: create/rename/delete terms and concepts,
+and pick relational links (`synonyms`/`variants`/`antagonists`/`concepts`) from
+dropdowns of existing entries — no raw ids. Every save validates the payload,
+writes the `.yml`, and regenerates `web/data.js`, so storage and the app never
+drift. Deleting an entry cascade-unlinks it from anything that referenced it.
+
+The server binds to `127.0.0.1` only and has no auth — it is a local tool, not
+meant to be exposed. Deep-link to an entry with `#<slug>` (e.g. `/#attach`).
+Commit the resulting `storage/` + `web/data.js` changes as usual.
 
 ## Dependencies
 

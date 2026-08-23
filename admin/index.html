@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DATC Admin</title>
+<style>
+  :root { --bg:#0b0b0d; --panel:#131317; --line:#24242b; --fg:#f1f1f3; --muted:#7e7e8a; --accent:#2fa1f2; }
+  * { box-sizing: border-box; }
+  html, body { margin:0; height:100%; background:var(--bg); color:var(--fg);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; }
+  button { font-family: inherit; cursor: pointer; }
+  input, select { font-family: inherit; }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+  #app { display:flex; flex-direction:column; height:100vh; }
+  header { display:flex; align-items:center; gap:16px; padding:12px 18px; border-bottom:1px solid #1c1c21; background:#0e0e11; }
+  header .logo { width:34px; height:34px; border-radius:8px; background:linear-gradient(135deg,#2fa1f2,#1b6fb0);
+    display:flex; align-items:center; justify-content:center; font-size:10px; color:#04121d; font-weight:600; }
+  .tab { padding:8px 16px; border-radius:8px; border:1px solid var(--line); background:#131317; color:#cfcfd6; font-size:14px; }
+  .tab.active { background:#12222e; color:#7cc6fb; border-color:#2b3d4c; }
+  .toast { margin-left:auto; font-size:13px; padding:6px 12px; border-radius:8px; min-width:120px; text-align:right; }
+  .toast.ok { color:#8fdca0; } .toast.err { color:#f2a9b3; }
+  main { flex:1; display:flex; min-height:0; }
+  .list { width:320px; flex:none; border-right:1px solid #1c1c21; display:flex; flex-direction:column; background:#0e0e11; }
+  .list .search { padding:12px; display:flex; gap:8px; }
+  .list .search input { flex:1; background:#131317; border:1px solid var(--line); border-radius:8px; padding:9px 12px; color:var(--fg); font-size:13px; outline:none; }
+  .list .items { flex:1; overflow:auto; padding:0 8px 8px; }
+  .row { width:100%; display:flex; align-items:center; gap:10px; padding:9px 10px; border:0; border-radius:6px; background:transparent; color:#b4b4be; text-align:left; font-size:14px; }
+  .row:hover { background:#17171c; } .row.sel { background:#1b1b21; color:#fff; }
+  .row .dot { width:7px; height:7px; border-radius:2px; flex:none; }
+  .row .badge { margin-left:auto; font-size:10px; color:#55555f; }
+  .newbtn { width:100%; padding:10px; border-radius:8px; border:1px dashed #33333d; background:transparent; color:#9fd4fb; font-size:13px; }
+  .form { flex:1; overflow:auto; padding:32px 40px 64px; }
+  .form .wrap { max-width:720px; }
+  .field { display:flex; gap:20px; padding:16px 0; border-bottom:1px solid #1f1f26; align-items:flex-start; }
+  .field label { width:130px; flex:none; font-size:14px; font-weight:600; color:#8d8d99; padding-top:8px; }
+  .field .control { flex:1; }
+  .field input.text, .field select.type { background:#0e0e12; border:1px solid #26262e; border-radius:8px; padding:10px 12px; color:var(--fg); font-size:14px; outline:none; min-width:260px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; align-items:center; }
+  .chip { display:flex; align-items:center; gap:8px; padding:6px 10px; border-radius:6px; font-size:13px; border:1px solid #2f2f3a; background:#17171c; color:#dcdce3; }
+  .chip.concept { border-color:#2b3d4c; background:#12222e; color:#9fd4fb; }
+  .chip.antagonist { border-color:#4a2a31; background:#1c1417; color:#f2a9b3; }
+  .chip button { border:0; background:none; color:inherit; font-size:12px; padding:0; line-height:1; opacity:0.7; }
+  .chip button:hover { opacity:1; }
+  .adder { background:#0e0e12; border:1px dashed #33333d; border-radius:6px; padding:6px 8px; color:#9a9aa5; font-size:13px; }
+  .actions { display:flex; gap:12px; margin-top:28px; align-items:center; }
+  .save { padding:11px 26px; border-radius:8px; border:0; font-size:14px; font-weight:600; background:var(--accent); color:#06131e; }
+  .del { padding:11px 20px; border-radius:8px; border:1px solid #4a2a31; background:#1c1417; color:#f2a9b3; font-size:13px; }
+  .idtag { margin-left:auto; font-size:11px; color:#4d4d57; }
+  .empty { height:100%; display:flex; align-items:center; justify-content:center; color:#4d4d57; font-size:14px; }
+  h2 { font-size:34px; font-weight:800; letter-spacing:-0.03em; margin:0 0 4px; text-transform:uppercase; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+"use strict";
+
+var API = "";
+var data = { terms: [], concepts: [] };
+var view = "terms";          // "terms" | "concepts"
+var listFilter = "";
+var editing = null;          // working buffer for the selected/new entity
+var toast = { msg: "", kind: "" };
+
+function display(slug) {
+  return String(slug).split("-").map(function (p) { return p.charAt(0).toUpperCase() + p.slice(1); }).join(" ");
+}
+function termById(id) { return data.terms.find(function (t) { return t.id === id; }); }
+function conceptById(id) { return data.concepts.find(function (c) { return c.id === id; }); }
+function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]; }); }
+
+function setToast(msg, kind) { toast = { msg: msg, kind: kind }; render(); }
+
+async function load() {
+  var r = await fetch(API + "/api/data");
+  data = await r.json();
+  // Optional deep-link: #<term-slug> opens that term for editing.
+  var h = decodeURIComponent((location.hash || "").replace(/^#/, ""));
+  if (h && !editing) {
+    var t = data.terms.find(function (x) { return x.slug === h; });
+    if (t) { editTerm(t); return; }
+    var c = data.concepts.find(function (x) { return x.slug === h; });
+    if (c) { view = "concepts"; editConcept(c); return; }
+  }
+  render();
+}
+
+async function api(method, path, body) {
+  var opts = { method: method, headers: { "Content-Type": "application/json" } };
+  if (body) opts.body = JSON.stringify(body);
+  var r = await fetch(API + path, opts);
+  var j = await r.json();
+  if (!r.ok) throw new Error(j.error || ("HTTP " + r.status));
+  return j;
+}
+
+/* ---- editing buffers ---- */
+function newTerm() {
+  editing = { originalSlug: null, slug: "", type: "", synonyms: [], variants: [], antagonists: [], concepts: [] };
+  render();
+}
+function editTerm(t) {
+  editing = { originalSlug: t.slug, slug: t.slug, type: t.type,
+    synonyms: t.synonyms.slice(), variants: t.variants.slice(),
+    antagonists: t.antagonists.slice(), concepts: t.concepts.slice(), id: t.id };
+  render();
+}
+function newConcept() { editing = { originalSlug: null, slug: "" }; render(); }
+function editConcept(c) { editing = { originalSlug: c.slug, slug: c.slug, id: c.id }; render(); }
+
+async function saveTerm() {
+  var e = editing;
+  var body = { slug: e.slug, type: e.type, synonyms: e.synonyms, variants: e.variants, antagonists: e.antagonists, concepts: e.concepts };
+  try {
+    if (e.originalSlug == null) {
+      await api("POST", "/api/term", body);
+    } else {
+      body.newSlug = e.slug;
+      await api("PUT", "/api/term/" + encodeURIComponent(e.originalSlug), body);
+    }
+    await load();
+    var t = data.terms.find(function (x) { return x.slug === e.slug; });
+    if (t) editTerm(t);
+    setToast("saved · " + e.slug, "ok");
+  } catch (err) { setToast(err.message, "err"); }
+}
+async function deleteTerm() {
+  if (!confirm("Delete term '" + editing.slug + "'? It will be unlinked from any referrers.")) return;
+  try {
+    var res = await api("DELETE", "/api/term/" + encodeURIComponent(editing.originalSlug));
+    editing = null;
+    await load();
+    setToast("deleted · unlinked from " + res.unlinked_from, "ok");
+  } catch (err) { setToast(err.message, "err"); }
+}
+async function saveConcept() {
+  var e = editing;
+  try {
+    if (e.originalSlug == null) await api("POST", "/api/concept", { slug: e.slug });
+    else await api("PUT", "/api/concept/" + encodeURIComponent(e.originalSlug), { newSlug: e.slug });
+    await load();
+    var c = data.concepts.find(function (x) { return x.slug === e.slug; });
+    if (c) editConcept(c);
+    setToast("saved · " + e.slug, "ok");
+  } catch (err) { setToast(err.message, "err"); }
+}
+async function deleteConcept() {
+  if (!confirm("Delete concept '" + editing.slug + "'? It will be unlinked from any terms.")) return;
+  try {
+    var res = await api("DELETE", "/api/concept/" + encodeURIComponent(editing.originalSlug));
+    editing = null;
+    await load();
+    setToast("deleted · unlinked from " + res.unlinked_from, "ok");
+  } catch (err) { setToast(err.message, "err"); }
+}
+
+/* ---- link field editing ---- */
+function removeLink(field, id) { editing[field] = editing[field].filter(function (x) { return x !== id; }); render(); }
+function addLink(field, id) { if (id && editing[field].indexOf(id) < 0) editing[field].push(id); render(); }
+
+/* ---- rendering ---- */
+var TYPE_DOT = { Noun:"#2fa1f2", noun:"#2fa1f2", Verb:"#e0b53c", verb:"#e0b53c", Adjective:"#9b6ff0", adjective:"#9b6ff0" };
+function typeDot(t) { return TYPE_DOT[t] || "#3a3a45"; }
+
+function render() {
+  var app = document.getElementById("app");
+  app.innerHTML =
+    header() +
+    '<main>' + listPane() + formPane() + '</main>';
+  bind();
+}
+
+function header() {
+  return '<header>' +
+    '<div class="logo mono">DATC</div>' +
+    '<button class="tab ' + (view === "terms" ? "active" : "") + '" data-view="terms">Terms</button>' +
+    '<button class="tab ' + (view === "concepts" ? "active" : "") + '" data-view="concepts">Concepts</button>' +
+    '<div class="toast ' + toast.kind + '">' + esc(toast.msg) + '</div>' +
+    '</header>';
+}
+
+function listPane() {
+  var f = listFilter.trim().toLowerCase();
+  var items, addLabel;
+  if (view === "terms") {
+    items = data.terms.filter(function (t) { return !f || t.slug.indexOf(f) >= 0; }).map(function (t) {
+      var sel = editing && editing.originalSlug === t.slug;
+      return '<button class="row ' + (sel ? "sel" : "") + '" data-term="' + esc(t.slug) + '">' +
+        '<span class="dot" style="background:' + typeDot(t.type) + '"></span>' +
+        '<span>' + esc(display(t.slug)) + '</span>' +
+        '<span class="badge mono">' + esc((t.type || "").slice(0,3)) + '</span></button>';
+    }).join("");
+    addLabel = "+ new term";
+  } else {
+    items = data.concepts.filter(function (c) { return !f || c.slug.indexOf(f) >= 0; }).map(function (c) {
+      var sel = editing && editing.originalSlug === c.slug;
+      return '<button class="row ' + (sel ? "sel" : "") + '" data-concept="' + esc(c.slug) + '">' +
+        '<span class="dot" style="background:#2fa1f2"></span>' +
+        '<span>' + esc(display(c.slug)) + '</span>' +
+        '<span class="badge mono">#' + c.id + '</span></button>';
+    }).join("");
+    addLabel = "+ new concept";
+  }
+  return '<div class="list">' +
+    '<div class="search"><input id="listFilter" placeholder="filter…" value="' + esc(listFilter) + '"/></div>' +
+    '<div class="items">' + items + '</div>' +
+    '<div style="padding:10px;"><button class="newbtn" id="newBtn">' + addLabel + '</button></div>' +
+    '</div>';
+}
+
+function formPane() {
+  if (!editing) return '<div class="form"><div class="empty">Select an entry, or create a new one.</div></div>';
+  return '<div class="form"><div class="wrap">' + (view === "terms" ? termForm() : conceptForm()) + '</div></div>';
+}
+
+function linkField(label, field, cls, options) {
+  var chips = editing[field].map(function (id) {
+    var o = options.find(function (x) { return x.id === id; });
+    var name = o ? display(o.slug) : ("#" + id);
+    return '<span class="chip ' + cls + '">' + esc(name) +
+      '<button data-rm="' + field + '" data-id="' + id + '">✕</button></span>';
+  }).join("");
+  var chosen = editing[field];
+  var opts = options
+    .filter(function (o) { return chosen.indexOf(o.id) < 0 && !(field !== "concepts" && o.id === editing.id); })
+    .sort(function (a, b) { return display(a.slug).localeCompare(display(b.slug)); })
+    .map(function (o) { return '<option value="' + o.id + '">' + esc(display(o.slug)) + '</option>'; }).join("");
+  var adder = '<select class="adder" data-add="' + field + '"><option value="">+ add</option>' + opts + '</select>';
+  return '<div class="field"><label>' + esc(label) + '</label><div class="control"><div class="chips">' + chips + adder + '</div></div></div>';
+}
+
+function termForm() {
+  var e = editing;
+  var types = ["", "noun", "verb", "adjective", "adverb", "phrase"];
+  var typeOpts = types.map(function (t) {
+    return '<option value="' + t + '"' + (e.type === t ? " selected" : "") + '>' + (t || "—") + '</option>';
+  }).join("");
+  return '<h2>' + esc(e.slug ? display(e.slug) : "New term") + '</h2>' +
+    '<div class="idtag mono">' + (e.originalSlug == null ? "unsaved" : "id " + e.id) + '</div>' +
+    '<div class="field"><label>Slug</label><div class="control">' +
+      '<input class="text" id="slugInput" value="' + esc(e.slug) + '" placeholder="lowercase-hyphenated"/>' +
+      '<div class="idtag mono" style="margin:6px 0 0;">filename = identity · changing this renames the file</div></div></div>' +
+    '<div class="field"><label>Type</label><div class="control"><select class="type" id="typeInput">' + typeOpts + '</select></div></div>' +
+    linkField("Concepts", "concepts", "concept", data.concepts) +
+    linkField("Synonyms", "synonyms", "", data.terms) +
+    linkField("Variants", "variants", "", data.terms) +
+    linkField("Antagonists", "antagonists", "antagonist", data.terms) +
+    '<div class="actions">' +
+      '<button class="save" id="saveBtn">Save</button>' +
+      (e.originalSlug != null ? '<button class="del" id="delBtn">Delete</button>' : '') +
+    '</div>';
+}
+
+function conceptForm() {
+  var e = editing;
+  var refCount = e.id != null ? data.terms.filter(function (t) { return t.concepts.indexOf(e.id) >= 0; }).length : 0;
+  return '<h2>' + esc(e.slug ? display(e.slug) : "New concept") + '</h2>' +
+    '<div class="idtag mono">' + (e.originalSlug == null ? "unsaved" : "id " + e.id + " · used by " + refCount + " terms") + '</div>' +
+    '<div class="field"><label>Slug</label><div class="control">' +
+      '<input class="text" id="slugInput" value="' + esc(e.slug) + '" placeholder="lowercase-hyphenated"/></div></div>' +
+    '<div class="actions">' +
+      '<button class="save" id="saveBtn">Save</button>' +
+      (e.originalSlug != null ? '<button class="del" id="delBtn">Delete</button>' : '') +
+    '</div>';
+}
+
+/* ---- event binding (re-run each render) ---- */
+function bind() {
+  document.querySelectorAll("[data-view]").forEach(function (b) {
+    b.onclick = function () { view = b.getAttribute("data-view"); editing = null; listFilter = ""; render(); };
+  });
+  var lf = document.getElementById("listFilter");
+  if (lf) lf.oninput = function () { listFilter = lf.value; var pos = lf.selectionStart; render(); var n = document.getElementById("listFilter"); if (n) { n.focus(); n.setSelectionRange(pos, pos); } };
+  document.querySelectorAll("[data-term]").forEach(function (b) {
+    b.onclick = function () { editTerm(data.terms.find(function (t) { return t.slug === b.getAttribute("data-term"); })); };
+  });
+  document.querySelectorAll("[data-concept]").forEach(function (b) {
+    b.onclick = function () { editConcept(data.concepts.find(function (c) { return c.slug === b.getAttribute("data-concept"); })); };
+  });
+  var nb = document.getElementById("newBtn");
+  if (nb) nb.onclick = function () { view === "terms" ? newTerm() : newConcept(); };
+
+  var slugI = document.getElementById("slugInput");
+  if (slugI) slugI.oninput = function () { editing.slug = slugI.value; };
+  var typeI = document.getElementById("typeInput");
+  if (typeI) typeI.onchange = function () { editing.type = typeI.value; };
+
+  document.querySelectorAll("[data-rm]").forEach(function (b) {
+    b.onclick = function () { removeLink(b.getAttribute("data-rm"), parseInt(b.getAttribute("data-id"), 10)); };
+  });
+  document.querySelectorAll("[data-add]").forEach(function (sel) {
+    sel.onchange = function () { addLink(sel.getAttribute("data-add"), parseInt(sel.value, 10)); };
+  });
+
+  var sb = document.getElementById("saveBtn");
+  if (sb) sb.onclick = function () { view === "terms" ? saveTerm() : saveConcept(); };
+  var db = document.getElementById("delBtn");
+  if (db) db.onclick = function () { view === "terms" ? deleteTerm() : deleteConcept(); };
+}
+
+load();
+</script>
+</body>
+</html>

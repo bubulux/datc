@@ -26,13 +26,23 @@ reference/          # original Claude "DC" design prototype (not shipped)
 See `storage/terms/README.md` and `storage/concepts/README.md` for the row
 schemas and constraints.
 
+## Make targets
+
+```
+make            # list targets
+make validate   # check storage schema + referential integrity
+make build      # regenerate web/data.js from storage/
+make check      # validate + build (run before committing)
+make serve      # live-reload dev server for the app (auto-builds on storage change)
+make admin      # local CRUD admin server for editing storage/
+```
+
 ## Workflow
 
-1. Edit term/concept files under `storage/` (an edit = a PR; the repo is the DB).
-2. `python3 scripts/validate.py` — fails on bad schema or dangling id links.
-3. `python3 scripts/build.py` — regenerates `web/data.js` from `storage/`.
-4. Open `web/index.html` in a browser. It runs straight from the filesystem
-   (`file://`) — `data.js` is a plain JS object, so no server is needed.
+1. Edit `storage/` (an edit = a PR; the repo is the DB) — by hand or via `make admin`.
+2. `make check` — validates, then regenerates `web/data.js`.
+3. Open `web/index.html` directly (runs from `file://`, no server needed), or run
+   `make serve` for a dev server that live-reloads on every `storage/`/`web/` change.
 
 `web/data.js` is a generated artifact committed for convenience (so the app is
 runnable on clone). Always regenerate it with `build.py` after changing

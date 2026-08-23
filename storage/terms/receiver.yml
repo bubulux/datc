@@ -1,6 +1,7 @@
 id: 101
-type:
+type: noun
 synonyms: []
 variants: []
 antagonists: []
-concepts: []
+concepts:
+  - 3

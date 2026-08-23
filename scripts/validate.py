@@ -81,6 +81,8 @@ def load_table(directory, errors):
 
 
 def check_link_list(rel, field, val, own_id, valid_ids, errors):
+    # own_id is None for cross-table FKs (e.g. concepts), where a target id
+    # equal to this row's id is a different table's row, not a self-reference.
     if val is None:
         return
     if not isinstance(val, list) or not all(
@@ -89,7 +91,7 @@ def check_link_list(rel, field, val, own_id, valid_ids, errors):
         errors.append(f"{rel}: '{field}' must be a list of integer ids")
         return
     for target in val:
-        if target == own_id:
+        if own_id is not None and target == own_id:
             errors.append(f"{rel}: '{field}' references its own id {target}")
         elif target not in valid_ids:
             errors.append(f"{rel}: {field} id {target} has no matching row")
@@ -118,7 +120,7 @@ def main():
                 rel, field, data.get(field), own_id, valid_term_ids, errors
             )
         check_link_list(
-            rel, "concepts", data.get("concepts"), own_id, valid_concept_ids, errors
+            rel, "concepts", data.get("concepts"), None, valid_concept_ids, errors
         )
 
     for f, (slug, data) in concept_rows.items():

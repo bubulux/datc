@@ -1,7 +1,8 @@
 id: 3
-type:
+type: verb
 synonyms: []
 variants:
   - 5
 antagonists: []
-concepts: []
+concepts:
+  - 10
